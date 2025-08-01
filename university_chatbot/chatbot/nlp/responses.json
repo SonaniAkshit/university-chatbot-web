@@ -1,0 +1,18 @@
+{
+    "eligibility": {
+        "keywords": ["eligibility", "requirements", "criteria", "qualifications", "who can apply"],
+        "response": "Eligibility: Minimum 50% in 12th grade for undergraduate programs, or a bachelor's degree with 55% for postgraduate programs."
+    },
+    "application_process": {
+        "keywords": ["apply", "application process", "how to apply", "submit application", "admission steps"],
+        "response": "Application Process: 1. Visit the university website. 2. Fill out the online form. 3. Upload documents. 4. Pay the fee. 5. Submit."
+    },
+    "deadlines": {
+        "keywords": ["deadline", "last date", "closing date", "when to apply"],
+        "response": "Deadlines: Undergraduate applications close on June 30th, postgraduate on July 15th."
+    },
+    "documents": {
+        "keywords": ["documents", "papers", "required documents", "what to submit"],
+        "response": "Required Documents: Academic transcripts, ID proof, passport-size photos, entrance exam scores (if applicable)."
+    }
+}
