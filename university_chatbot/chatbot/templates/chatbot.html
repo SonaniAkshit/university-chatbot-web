@@ -1,0 +1,235 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gujarat Vidyapith University - AI Assistant</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+</head>
+<body>
+    <div class="container">
+        <!-- Main Chatbot Interface -->
+        <div class="chatbot_area">
+            <!-- Header -->
+            <div class="header">
+                <div class="logo">
+                    <img src="{% static 'media/gujarat-vidyapith-logo.png' %}" alt="Gujarat Vidyapith Logo">
+                </div>
+                <div>
+                    <div class="title">Gujarat Vidyapith</div>
+                    <div class="sub_title">AI Assistant & Support</div>
+                    <div class="status_indicator">
+                        <span class="status_dot"></span>
+                        Online & Ready to Help
+                    </div>
+                </div>
+                <button class="sidebar_toggle" onclick="toggleSidebar()" id="sidebarToggle">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+            </div>
+
+            <!-- Chat Container -->
+            <div class="chat_container">
+                <!-- Chat Messages -->
+                <div class="chat_messages" id="chatMessages">
+                    <!-- Initial Bot Message -->
+                    <div class="message bot">
+                        <div class="avatar bot_avatar">🤖</div>
+                        <div class="message_bubble">
+                            Hello! I'm your Gujarat Vidyapith University assistant. I can help you with information about admissions, courses, campus facilities, fees, and much more. What would you like to know?
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Input Area -->
+                <div class="input_area">
+                    <div class="input_group">
+                        <textarea 
+                            id="messageInput" 
+                            class="input_style" 
+                            placeholder="Type your question here..."
+                            rows="1"
+                        ></textarea>
+                        <button class="send_btn" onclick="sendMessage()">
+                            ➤
+                        </button>
+                        <button class="clear_btn" onclick="clearChat()">
+                            Clear
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions Sidebar -->
+        <div class="quick_actions" id="quickActions">
+            <div class="quick_title">Quick Help</div>
+            <button class="quick_btn" onclick="askQuestion('Tell me about admission requirements')">
+                📝 Admission Requirements
+            </button>
+            <button class="quick_btn" onclick="askQuestion('What courses are available?')">
+                🎓 Available Courses
+            </button>
+            <button class="quick_btn" onclick="askQuestion('Tell me about campus facilities')">
+                🏫 Campus Facilities
+            </button>
+            <button class="quick_btn" onclick="askQuestion('What are the fee structures?')">
+                💰 Fee Structure
+            </button>
+            <button class="quick_btn" onclick="askQuestion('How do I apply for admission?')">
+                📋 Application Process
+            </button>
+            <button class="quick_btn" onclick="askQuestion('Tell me about scholarships')">
+                🏆 Scholarships
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const chatMessages = document.getElementById('chatMessages');
+        const messageInput = document.getElementById('messageInput');
+        const quickActions = document.getElementById('quickActions');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        let sidebarOpen = false;
+
+        // Sample bot responses for demonstration
+        const sampleResponses = [
+            "Thank you for your question! I'd be happy to help you with information about Gujarat Vidyapith University.",
+            "That's a great question! Let me provide you with the relevant information about our university programs.",
+            "I understand you're interested in learning more. Here's what I can tell you about our facilities and services.",
+            "Excellent inquiry! Our university offers comprehensive support for all students. Let me explain the details.",
+            "That's an important question for prospective students. Here's the information you're looking for."
+        ];
+
+        function toggleSidebar() {
+            sidebarOpen = !sidebarOpen;
+            quickActions.classList.toggle('open');
+            sidebarToggle.classList.toggle('hidden', sidebarOpen);
+        }
+
+        // Close sidebar when clicking outside
+        document.addEventListener('click', function(event) {
+            const isClickInsideSidebar = quickActions.contains(event.target);
+            const isClickOnToggle = sidebarToggle.contains(event.target);
+            
+            if (!isClickInsideSidebar && !isClickOnToggle && sidebarOpen) {
+                toggleSidebar();
+            }
+        });
+
+        function addMessage(text, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+            
+            const avatar = document.createElement('div');
+            avatar.className = `avatar ${isUser ? 'user_avatar' : 'bot_avatar'}`;
+            avatar.textContent = isUser ? '👤' : '🤖';
+            
+            const bubble = document.createElement('div');
+            bubble.className = 'message_bubble';
+            bubble.textContent = text;
+            
+            if (isUser) {
+                messageDiv.appendChild(bubble);
+                messageDiv.appendChild(avatar);
+            } else {
+                messageDiv.appendChild(avatar);
+                messageDiv.appendChild(bubble);
+            }
+            
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function showTyping() {
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message bot';
+            typingDiv.id = 'typing-indicator';
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'avatar bot_avatar';
+            avatar.textContent = '🤖';
+            
+            const typingBubble = document.createElement('div');
+            typingBubble.className = 'typing_indicator';
+            typingBubble.innerHTML = `
+                <div class="typing_dots">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+            `;
+            
+            typingDiv.appendChild(avatar);
+            typingDiv.appendChild(typingBubble);
+            chatMessages.appendChild(typingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function removeTyping() {
+            const typingIndicator = document.getElementById('typing-indicator');
+            if (typingIndicator) {
+                typingIndicator.remove();
+            }
+        }
+
+        function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message) return;
+
+            // Add user message
+            addMessage(message, true);
+            messageInput.value = '';
+
+            // Show typing indicator
+            showTyping();
+
+            // Simulate bot response after delay
+            setTimeout(() => {
+                removeTyping();
+                const randomResponse = sampleResponses[Math.floor(Math.random() * sampleResponses.length)];
+                addMessage(randomResponse);
+            }, 1500 + Math.random() * 1000);
+        }
+
+        function askQuestion(question) {
+            messageInput.value = question;
+            sendMessage();
+            // Close sidebar after selecting a question
+            if (sidebarOpen) {
+                toggleSidebar();
+            }
+        }
+
+        function clearChat() {
+            // Keep only the initial message
+            const messages = chatMessages.querySelectorAll('.message');
+            messages.forEach((message, index) => {
+                if (index > 0) {
+                    message.remove();
+                }
+            });
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Auto-resize textarea
+        messageInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+        });
+
+        // Send message on Enter key
+        messageInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // Focus input on page load
+        messageInput.focus();
+    </script>
+</body>
+</html>
