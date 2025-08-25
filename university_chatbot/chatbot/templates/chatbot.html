@@ -2,234 +2,152 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gujarat Vidyapith University - AI Assistant</title>
-    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gujarat Vidyapith</title>
+  <link rel="icon" type="image/png" href="{% static 'media/gujarat-vidyapith-logo.png' %}">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { darkMode: 'class' }
+  </script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- Google Material Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 </head>
-<body>
-    <div class="container">
-        <!-- Main Chatbot Interface -->
-        <div class="chatbot_area">
-            <!-- Header -->
-            <div class="header">
-                <div class="logo">
-                    <img src="{% static 'media/gujarat-vidyapith-logo.png' %}" alt="Gujarat Vidyapith Logo">
-                </div>
-                <div>
-                    <div class="title">Gujarat Vidyapith</div>
-                    <div class="sub_title">AI Assistant & Support</div>
-                    <div class="status_indicator">
-                        <span class="status_dot"></span>
-                        Online & Ready to Help
-                    </div>
-                </div>
-                <button class="sidebar_toggle" onclick="toggleSidebar()" id="sidebarToggle">
-                    <span class="material-symbols-outlined">menu</span>
-                </button>
-            </div>
 
-            <!-- Chat Container -->
-            <div class="chat_container">
-                <!-- Chat Messages -->
-                <div class="chat_messages" id="chatMessages">
-                    <!-- Initial Bot Message -->
-                    <div class="message bot">
-                        <div class="avatar bot_avatar">🤖</div>
-                        <div class="message_bubble">
-                            Hello! I'm your Gujarat Vidyapith University assistant. I can help you with information about admissions, courses, campus facilities, fees, and much more. What would you like to know?
-                        </div>
-                    </div>
-                </div>
+<body class="h-screen flex flex-col bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300">
 
-                <!-- Input Area -->
-                <div class="input_area">
-                    <div class="input_group">
-                        <textarea 
-                            id="messageInput" 
-                            class="input_style" 
-                            placeholder="Type your question here..."
-                            rows="1"
-                        ></textarea>
-                        <button class="send_btn" onclick="sendMessage()">
-                            ➤
-                        </button>
-                        <button class="clear_btn" onclick="clearChat()">
-                            Clear
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Quick Actions Sidebar -->
-        <div class="quick_actions" id="quickActions">
-            <div class="quick_title">Quick Help</div>
-            <button class="quick_btn" onclick="askQuestion('Tell me about admission requirements')">
-                📝 Admission Requirements
-            </button>
-            <button class="quick_btn" onclick="askQuestion('What courses are available?')">
-                🎓 Available Courses
-            </button>
-            <button class="quick_btn" onclick="askQuestion('Tell me about campus facilities')">
-                🏫 Campus Facilities
-            </button>
-            <button class="quick_btn" onclick="askQuestion('What are the fee structures?')">
-                💰 Fee Structure
-            </button>
-            <button class="quick_btn" onclick="askQuestion('How do I apply for admission?')">
-                📋 Application Process
-            </button>
-            <button class="quick_btn" onclick="askQuestion('Tell me about scholarships')">
-                🏆 Scholarships
-            </button>
-        </div>
+  <!-- Header
+  <header class="bg-white dark:bg-gray-800 border-b px-4 py-3 flex items-center justify-between shadow-sm">
+    <div class="flex items-center gap-3">
+      <img src="{% static 'media/gujarat-vidyapith-logo.png' %}" alt="Gujarat Vidyapith Logo" class="h-10 w-auto">
+      <h1 class="font-semibold text-lg">Gujarat Vidyapith</h1>
     </div>
+    <button id="themeToggle" class="px-3 py-1 rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-gray-700">
+      <span class="material-symbols-outlined">routine</span>
+    </button>
+  </header> -->
+  <!-- Header -->
+<!-- Header -->
+<header class="bg-white dark:bg-gray-800 border-b px-4 py-3 flex items-center justify-between shadow-sm">
+  <!-- Empty left side (to balance layout) -->
+  <div class="w-10"></div>
 
-    <script>
-        const chatMessages = document.getElementById('chatMessages');
-        const messageInput = document.getElementById('messageInput');
-        const quickActions = document.getElementById('quickActions');
-        const sidebarToggle = document.getElementById('sidebarToggle');
-        let sidebarOpen = false;
+  <!-- Center Title -->
+  <h1 class="text-lg font-semibold text-gray-800 dark:text-gray-200 text-center">
+    GVP University Help Desk AI
+  </h1>
 
-        // Sample bot responses for demonstration
-        const sampleResponses = [
-            "Thank you for your question! I'd be happy to help you with information about Gujarat Vidyapith University.",
-            "That's a great question! Let me provide you with the relevant information about our university programs.",
-            "I understand you're interested in learning more. Here's what I can tell you about our facilities and services.",
-            "Excellent inquiry! Our university offers comprehensive support for all students. Let me explain the details.",
-            "That's an important question for prospective students. Here's the information you're looking for."
-        ];
+  <!-- Theme Toggle -->
+  <button id="themeToggle" class="px-3 py-1 rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-gray-700">
+    <span class="material-symbols-outlined">routine</span>
+  </button>
+</header>
 
-        function toggleSidebar() {
-            sidebarOpen = !sidebarOpen;
-            quickActions.classList.toggle('open');
-            sidebarToggle.classList.toggle('hidden', sidebarOpen);
-        }
 
-        // Close sidebar when clicking outside
-        document.addEventListener('click', function(event) {
-            const isClickInsideSidebar = quickActions.contains(event.target);
-            const isClickOnToggle = sidebarToggle.contains(event.target);
-            
-            if (!isClickInsideSidebar && !isClickOnToggle && sidebarOpen) {
-                toggleSidebar();
-            }
-        });
 
-        function addMessage(text, isUser = false) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
-            
-            const avatar = document.createElement('div');
-            avatar.className = `avatar ${isUser ? 'user_avatar' : 'bot_avatar'}`;
-            avatar.textContent = isUser ? '👤' : '🤖';
-            
-            const bubble = document.createElement('div');
-            bubble.className = 'message_bubble';
-            bubble.textContent = text;
-            
-            if (isUser) {
-                messageDiv.appendChild(bubble);
-                messageDiv.appendChild(avatar);
-            } else {
-                messageDiv.appendChild(avatar);
-                messageDiv.appendChild(bubble);
-            }
-            
-            chatMessages.appendChild(messageDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
+  <div class="flex flex-1 overflow-hidden">
+    <!-- Sidebar -->
+    <aside class="hidden md:flex flex-col w-64 border-r bg-white dark:bg-gray-900 p-6">
+      <!-- Logo + Title -->
+      <div class="flex flex-col items-center mb-6">
+        <img src="{% static 'media/gvplogo.png' %}" 
+             alt="Gujarat Vidyapith Logo" class="w-20 h-20 mb-2 rounded-full border border-gray-300 dark:border-gray-700 shadow-sm">
+        <h2 class="text-lg font-semibold text-center">Gujarat Vidyapith</h2>
+        <p class="text-sm text-gray-500 dark:text-gray-400">Founded by Mahatma Gandhi</p>
+        <hr class="w-full my-4 border-gray-300 dark:border-gray-700">
+      </div>
 
-        function showTyping() {
-            const typingDiv = document.createElement('div');
-            typingDiv.className = 'message bot';
-            typingDiv.id = 'typing-indicator';
-            
-            const avatar = document.createElement('div');
-            avatar.className = 'avatar bot_avatar';
-            avatar.textContent = '🤖';
-            
-            const typingBubble = document.createElement('div');
-            typingBubble.className = 'typing_indicator';
-            typingBubble.innerHTML = `
-                <div class="typing_dots">
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                </div>
-            `;
-            
-            typingDiv.appendChild(avatar);
-            typingDiv.appendChild(typingBubble);
-            chatMessages.appendChild(typingDiv);
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
+      <!-- New Chat Button -->
+      <button id="newChatBtn" class="w-full text-left px-3 py-2 rounded-xl border hover:bg-gray-100 dark:hover:bg-gray-700">
+        New Chat
+      </button>
+    </aside>
 
-        function removeTyping() {
-            const typingIndicator = document.getElementById('typing-indicator');
-            if (typingIndicator) {
-                typingIndicator.remove();
-            }
-        }
+    <!-- Chat Area -->
+    <main class="flex-1 flex flex-col">
+      <!-- Messages -->
+      <div id="chatbox" class="flex-1 overflow-y-auto p-6 space-y-4">
+        <div class="flex justify-start">
+          <div class="bg-gray-100 dark:bg-gray-700 px-4 py-2 rounded-2xl max-w-md text-sm">
+            Hello! I’m UniBuddy. Ask me anything about the university.
+          </div>
+        </div>
+      </div>
 
-        function sendMessage() {
-            const message = messageInput.value.trim();
-            if (!message) return;
+      <!-- Input Area -->
+      <div class="border-t bg-white dark:bg-gray-800 p-4">
+        <div class="flex items-end gap-2 border rounded-2xl p-2 shadow-sm dark:border-gray-700">
+          <textarea id="user_input" rows="1" placeholder="Type a message..." class="flex-1 resize-none outline-none p-2 text-sm bg-transparent"></textarea>
+          <button id="sendBtn" class="bg-indigo-600 text-white px-4 py-2 rounded-xl text-sm hover:bg-indigo-500">Send</button>
+        </div>
+      </div>
+    </main>
+  </div>
 
-            // Add user message
-            addMessage(message, true);
-            messageInput.value = '';
+  <script>
+    // === Helper: Add user + bot messages ===
+    function addUserMessage(text) {
+      $("#chatbox").append(`
+        <div class="flex justify-end">
+          <div class="bg-indigo-600 text-white px-4 py-2 rounded-2xl max-w-md text-sm">
+            ${text}
+          </div>
+        </div>
+      `);
+      $("#chatbox").scrollTop($("#chatbox")[0].scrollHeight);
+    }
 
-            // Show typing indicator
-            showTyping();
+    function addBotMessage(text) {
+      $("#chatbox").append(`
+        <div class="flex justify-start">
+          <div class="bg-gray-100 dark:bg-gray-700 px-4 py-2 rounded-2xl max-w-md text-sm">
+            ${text}
+          </div>
+        </div>
+      `);
+      $("#chatbox").scrollTop($("#chatbox")[0].scrollHeight);
+    }
 
-            // Simulate bot response after delay
-            setTimeout(() => {
-                removeTyping();
-                const randomResponse = sampleResponses[Math.floor(Math.random() * sampleResponses.length)];
-                addMessage(randomResponse);
-            }, 1500 + Math.random() * 1000);
-        }
+    // === Send message manually ===
+    function sendMessage() {
+      var userText = $("#user_input").val();
+      if (userText.trim() === "") return;
 
-        function askQuestion(question) {
-            messageInput.value = question;
-            sendMessage();
-            // Close sidebar after selecting a question
-            if (sidebarOpen) {
-                toggleSidebar();
-            }
-        }
+      addUserMessage(userText);
+      $("#user_input").val("");
 
-        function clearChat() {
-            // Keep only the initial message
-            const messages = chatMessages.querySelectorAll('.message');
-            messages.forEach((message, index) => {
-                if (index > 0) {
-                    message.remove();
-                }
-            });
-            chatMessages.scrollTop = chatMessages.scrollHeight;
-        }
+      $.get("/get/", { msg: userText }).done(function(data) {
+        addBotMessage(data.reply);
+      });
+    }
 
-        // Auto-resize textarea
-        messageInput.addEventListener('input', function() {
-            this.style.height = 'auto';
-            this.style.height = Math.min(this.scrollHeight, 100) + 'px';
-        });
+    // === Events ===
+    $("#user_input").keypress(function(e) {
+      if (e.which === 13 && !e.shiftKey) {
+        sendMessage();
+        return false;
+      }
+    });
+    $("#sendBtn").click(sendMessage);
 
-        // Send message on Enter key
-        messageInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
-            }
-        });
+    // === Sidebar button action ===
+    $("#newChatBtn").click(function() {
+      $("#chatbox").html(`
+        <div class="flex justify-start">
+          <div class="bg-gray-100 dark:bg-gray-700 px-4 py-2 rounded-2xl max-w-md text-sm">
+            Hello! I’m UniBuddy. Ask me anything about the university.
+          </div>
+        </div>
+      `);
+      $("#user_input").val("");
+    });
 
-        // Focus input on page load
-        messageInput.focus();
-    </script>
+    // === Theme toggle ===
+    $("#themeToggle").click(function() {
+      $("html").toggleClass("dark");
+    });
+  </script>
+
 </body>
 </html>
