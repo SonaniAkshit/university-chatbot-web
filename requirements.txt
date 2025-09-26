@@ -4,6 +4,7 @@ djongo
 # PyTorch + NLP
 torch
 nltk
+numpy
 
 # Extra utilities
 setuptools
