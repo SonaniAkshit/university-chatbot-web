@@ -1,0 +1,270 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gujarat Vidyapith</title>
+    <link rel="icon" type="image/png" href="{% static 'media/favicon.png' %}" >
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { darkMode: 'class' }
+    </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Google Material Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <style>
+        /* Typing dots animation */
+        .typing-dots span {
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            margin: 0 2px;
+            background: currentColor;
+            border-radius: 50%;
+            animation: bounce 1s infinite;
+        }
+        .typing-dots span:nth-child(2) { animation-delay: 0.1s; }
+        .typing-dots span:nth-child(3) { animation-delay: 0.2s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0.6); }
+            40% { transform: scale(1); }
+        }
+
+        /* Input focus animation */
+        #user_input:focus {
+            border-radius: 12px;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.5);
+            transition: box-shadow 0.3s ease, border-radius 0.3s ease;
+        }
+        
+        /* Custom scrollbar styles */
+        #chatbox::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        #chatbox::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        #chatbox::-webkit-scrollbar-thumb {
+            background-color: #d1d5db; /* gray-300 */
+            border-radius: 4px;
+        }
+
+        .dark #chatbox::-webkit-scrollbar-thumb {
+            background-color: #4b5563; /* gray-600 */
+        }
+    </style>
+</head>
+
+<body class="h-screen flex flex-col bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300">
+
+<!-- Header -->
+<header class="bg-white dark:bg-gray-800 border-b px-4 py-3 flex items-center justify-between shadow-sm">
+    <h1 class="text-lg font-semibold text-gray-800 dark:text-gray-200 text-center flex-1 text-center">
+        GVP University Help Desk AI
+    </h1>
+
+    <div class="flex items-center gap-3">
+        <!-- Register/User button -->
+        <a href="{% url 'profile' %}" 
+            class="px-3 py-1 rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center">
+            <span class="material-symbols-outlined">account_circle</span>
+        </a>
+
+        <!-- Theme toggle -->
+        <button id="themeToggle" 
+                class="px-3 py-1 rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-gray-700">
+            <span class="material-symbols-outlined">routine</span>
+        </button>
+    </div>
+</header>
+
+
+<div class="flex flex-1 overflow-hidden">
+    <!-- Sidebar -->
+    <aside class="hidden md:flex flex-col w-64 border-r bg-white dark:bg-gray-900 p-6">
+        <div class="flex flex-col items-center mb-6">
+            <img src="{% static 'media/gvlogo.png' %}" 
+                alt="Gujarat Vidyapith Logo" class="w-20 h-20 mb-2 rounded-full border border-gray-300 dark:border-gray-700 shadow-sm">
+            <h2 class="text-lg font-semibold text-center">Gujarat Vidyapith</h2>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Founded by Mahatma Gandhi</p>
+            <hr class="w-full my-4 border-gray-300 dark:border-gray-700">
+        </div>
+        <button id="newChatBtn" class="w-full text-left px-3 py-2 rounded-xl border hover:bg-gray-100 dark:hover:bg-gray-700">
+            New Chat
+        </button>
+    </aside>
+
+    <!-- Chat Area -->
+    <main class="flex-1 flex flex-col">
+        <div id="chatbox" class="flex-1 overflow-y-auto p-6 space-y-4">
+            <div class="flex justify-start">
+                <div class="bg-gray-100 dark:bg-gray-700 px-4 py-2 rounded-2xl max-w-md text-sm">
+                    Hello! I’m UniBuddy. Ask me anything about the university.
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="border-t bg-white dark:bg-gray-800 p-3">
+            <div class="flex items-center gap-2 border rounded-xl p-1.5 shadow-sm dark:border-gray-700">
+                <textarea id="user_input" rows="1" 
+                    placeholder="Type a message..." 
+                    class="flex-1 resize-none outline-none px-2 py-1 text-sm bg-transparent"></textarea>
+
+                <button id="sendBtn" 
+                    class="bg-[#703737] text-white px-3 py-1.5 rounded-lg text-sm hover:bg-[#582e2e] transition flex items-center justify-center">
+                    <span class="material-symbols-outlined text-base">send</span>
+                </button>
+            </div>
+        </div>
+    </main>
+</div>  
+
+<script>
+    // Theme toggle functionality
+    function setTheme(theme) {
+        if (theme === 'dark') {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+        localStorage.setItem('theme', theme);
+    }
+
+    // Check system preference or saved theme
+    function initializeTheme() {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+            setTheme(savedTheme);
+        } else {
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            setTheme(prefersDark ? 'dark' : 'light');
+        }
+    }
+
+    // Initialize theme on page load
+    initializeTheme();
+
+    // Toggle theme on button click
+    $("#themeToggle").click(function() {
+        const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        setTheme(newTheme);
+    });
+
+    // Listen for system theme changes
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        const savedTheme = localStorage.getItem('theme');
+        if (!savedTheme) { // Only update if user hasn't manually set a theme
+            setTheme(e.matches ? 'dark' : 'light');
+        }
+    });
+
+    function addUserMessage(text) {
+        $("#chatbox").append(`
+            <div class="flex justify-end">
+                <div class="bg-[#703737] text-white px-4 py-2 rounded-2xl max-w-md text-sm animate-fadeIn">
+                    ${text}
+                </div>
+            </div>
+        `);
+        $("#chatbox").scrollTop($("#chatbox")[0].scrollHeight);
+    }
+
+    function addBotMessage(text) {
+        // Simple Markdown renderer
+        function renderMarkdown(mdText) {
+            // Replace bold markdown with HTML <strong> tag
+            mdText = mdText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            // Add more render rules here if needed
+            return mdText;
+        }
+
+        const formattedText = renderMarkdown(text);
+        const messageHtml = `
+            <div class="flex justify-start">
+                <div class="relative group">
+                    <div class="bg-gray-100 dark:bg-gray-700 px-4 py-2 rounded-2xl max-w-md text-sm animate-fadeIn">
+                        ${formattedText}
+                    </div>
+                    <button class="copy-btn absolute top-1 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1 rounded-md text-gray-400 hover:text-gray-900 dark:hover:text-gray-100">
+                        <span class="material-symbols-outlined text-sm">content_copy</span>
+                    </button>
+                </div>
+            </div>
+        `;
+        $("#chatbox").append(messageHtml);
+        $("#chatbox").scrollTop($("#chatbox")[0].scrollHeight);
+        
+        // Attach click event listener to the new copy button
+        const copyButton = $("#chatbox").find('.copy-btn').last();
+        copyButton.click(function() {
+            navigator.clipboard.writeText(text).then(() => {
+                const copyIcon = $(this).find('.material-symbols-outlined');
+                copyIcon.text('done');
+                setTimeout(() => copyIcon.text('content_copy'), 2000);
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+            });
+        });
+    }
+
+    function showTypingIndicator() {
+        $("#chatbox").append(`
+            <div id="typing" class="flex justify-start">
+                <div class="bg-gray-100 dark:bg-gray-700 px-4 py-2 rounded-2xl max-w-md text-sm typing-dots">
+                    <span></span><span></span><span></span>
+                </div>
+            </div>
+        `);
+        $("#chatbox").scrollTop($("#chatbox")[0].scrollHeight);
+    }
+
+    function removeTypingIndicator() {
+        $("#typing").remove();
+    }
+
+    function sendMessage() {
+        var userText = $("#user_input").val();
+        if (userText.trim() === "") return;
+
+        addUserMessage(userText);
+        $("#user_input").val("");
+
+        showTypingIndicator();
+
+        $.get("/get/", { msg: userText }).done(function(data) {
+            setTimeout(function() {
+                removeTypingIndicator();
+                addBotMessage(data.reply);
+            }, 1500); // 1.5s delay for typing effect
+        });
+    }
+
+    $("#user_input").keypress(function(e) {
+        if (e.which === 13 && !e.shiftKey) {
+            sendMessage();
+            return false;
+        }
+    });
+    $("#sendBtn").click(sendMessage);
+
+    $("#newChatBtn").click(function() {
+        $("#chatbox").html(`
+            <div class="flex justify-start">
+                <div class="bg-gray-100 dark:bg-gray-700 px-4 py-2 rounded-2xl max-w-md text-sm">
+                    Hello! I’m UniBuddy. Ask me anything about the university.
+                </div>
+            </div>
+        `);
+        $("#user_input").val("");
+    });
+</script>
+
+</body>
+</html>

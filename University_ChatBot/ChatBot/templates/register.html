@@ -1,0 +1,179 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registration | Gujarat Vidyapith</title>
+  <link rel="icon" type="image/png" href="{% static 'media/favicon.png' %}">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { darkMode: 'class' }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+  <style>
+    /* Smooth animation for inputs and selects */
+    .animated-input {
+      transition: all 0.3s ease-in-out;
+    }
+
+    .animated-input:focus {
+      outline: none;
+      border: 1px solid #703737;
+      box-shadow: 0 0 0 3px rgba(112, 55, 55, 0.3);
+      transform: scale(1.02);
+    }
+
+    /* Register button hover */
+    .btn-register {
+      background-color: #703737;
+      transition: all 0.3s ease;
+    }
+    .btn-register:hover {
+      background-color: #8c4b4b;
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+
+<body class="h-screen flex flex-col bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300">
+
+<!-- Header -->
+<header class="bg-white dark:bg-gray-800 border-b px-4 py-3 flex items-center justify-between shadow-sm">
+  <div></div>
+  <h1 class="text-lg font-semibold text-gray-800 dark:text-gray-200 text-center">
+    GVP University Help Desk AI Registration
+  </h1>
+   <div class="flex items-center gap-3">
+    <!-- Chatbot/Home button -->
+   <a href="{% url 'chatbot_home' %}" 
+      class="px-3 py-1 rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center">
+      <span class="material-symbols-outlined">robot_2</span>
+    </a>
+
+    <!-- Theme toggle -->
+    <button id="themeToggle" 
+            class="px-3 py-1 rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-gray-700">
+      <span class="material-symbols-outlined">routine</span>
+    </button>
+  </div>
+</header>
+
+<!-- Registration Section -->
+<main class="flex-1 flex items-center justify-center p-6">
+  <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg w-full max-w-md p-8">
+
+    <!-- Logo + Title -->
+    <div class="flex flex-col items-center mb-6">
+      <img src="{% static 'media/gvlogo.png' %}" 
+           alt="Gujarat Vidyapith Logo" 
+           class="w-20 h-20 mb-3 rounded-full border border-gray-300 dark:border-gray-700 shadow-sm">
+      <h2 class="text-2xl font-semibold text-center">Gujarat Vidyapith</h2>
+      <p class="text-sm text-gray-500 dark:text-gray-400">Founded by Mahatma Gandhi</p>
+    </div>
+
+    <!-- Form -->
+    <form action="/register/" method="POST" class="space-y-4">
+      {% csrf_token %}
+
+      <!-- Full Name + Username -->
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label for="full_name" class="block text-sm font-medium mb-1">Full Name</label>
+          <input type="text" id="full_name" name="full_name" required
+            class="animated-input w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent text-sm">
+        </div>
+        <div>
+          <label for="username" class="block text-sm font-medium mb-1">Username</label>
+          <input type="text" id="username" name="username" required
+            class="animated-input w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent text-sm">
+        </div>
+      </div>
+
+      <!-- Email -->
+      <div>
+          <label for="email" class="block text-sm font-medium mb-1">Email</label>
+          <input type="email" id="email" name="email" required
+            class="animated-input w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent text-sm">
+      </div>
+
+      <!-- Password + Confirm Password -->
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label for="password" class="block text-sm font-medium mb-1">Password</label>
+          <input type="password" id="password" name="password" required
+            class="animated-input w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent text-sm">
+        </div>
+        <div>
+          <label for="confirm_password" class="block text-sm font-medium mb-1">Confirm Password</label>
+          <input type="password" id="confirm_password" name="confirm_password" required
+            class="animated-input w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent text-sm">
+        </div>
+      </div>
+
+      <!-- Gender + Role -->
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label for="gender" class="block text-sm font-medium mb-1">Gender</label>
+          <select id="gender" name="gender" required
+            class="animated-input w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent text-sm">
+            <option value="" disabled selected>Select Gender</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div>
+          <label for="role" class="block text-sm font-medium mb-1">Role</label>
+          <select id="role" name="role" required
+            class="animated-input w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent text-sm">
+            <option value="" disabled selected>Select Role</option>
+            <option value="student">Student</option>
+            <option value="parent">Parent</option>
+            <option value="faculty">Faculty</option>
+            <option value="staff">Staff</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+      </div>
+
+      <button type="submit"
+        class="btn-register w-full text-white py-2 rounded-lg font-medium">
+        Register
+      </button>
+    </form>
+
+    <!-- Footer -->
+  <p class="text-center text-sm mt-4 text-gray-500 dark:text-gray-400">
+    Already have an account? 
+    <a href="{% url 'login' %}" class="text-blue-600 hover:underline">Login</a>
+  </p>
+
+  </div>
+</main>
+
+<script>
+  function setTheme(theme) {
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+    localStorage.setItem('theme', theme);
+  }
+
+  function initializeTheme() {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      setTheme(savedTheme);
+    } else {
+      setTheme(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    }
+  }
+
+  initializeTheme();
+
+  document.getElementById("themeToggle").addEventListener("click", () => {
+    const current = document.documentElement.classList.contains("dark") ? "dark" : "light";
+    setTheme(current === "dark" ? "light" : "dark");
+  });
+</script>
+
+</body>
+</html>

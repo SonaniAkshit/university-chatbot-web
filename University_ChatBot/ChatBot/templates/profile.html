@@ -1,0 +1,194 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Profile | Gujarat Vidyapith</title>
+  <link rel="icon" type="image/png" href="{% static 'media/favicon.png' %}">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { darkMode: 'class' }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+  <style>
+    /* Profile info display */
+    .profile-info {
+      border-bottom: 1px solid #ccc;
+      padding: 6px 0;
+      width: 100%;
+      color: inherit;
+      font-size: 1rem;
+    }
+
+    /* Buttons */
+    .btn-primary {
+      background-color: #703737;
+      transition: all 0.3s ease;
+    }
+    .btn-primary:hover {
+      background-color: #8c4b4b;
+      transform: scale(1.05);
+    }
+
+    /* Modal overlay */
+    .modal-bg {
+      background: rgba(0,0,0,0.5);
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+    }
+    .modal-bg.active {
+      display: flex;
+    }
+
+    /* Modal form */
+    .modal-form input, .modal-form select {
+      width: 100%;
+      padding: 6px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 0.95rem;
+    }
+    .modal-form input:focus, .modal-form select:focus {
+      outline: none;
+      border-color: #703737;
+    }
+  </style>
+</head>
+
+<body class="h-screen flex flex-col bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300">
+
+<!-- Header -->
+<header class="bg-white dark:bg-gray-800 border-b px-4 py-3 flex items-center justify-between shadow-sm">
+  <div></div>
+  <h1 class="text-lg font-semibold text-gray-800 dark:text-gray-200 text-center">
+    GVP University Help Desk AI
+  </h1>
+  <div class="flex items-center gap-3">
+    <a href="{% url 'chatbot_home' %}" 
+       class="px-3 py-1 rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center">
+      <span class="material-symbols-outlined">robot_2</span>
+    </a>
+    <button id="themeToggle" 
+            class="px-3 py-1 rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-gray-700">
+      <span class="material-symbols-outlined">routine</span>
+    </button>
+  </div>
+</header>
+
+<!-- Profile Section -->
+<main class="flex-1 flex items-center justify-center p-6">
+  <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg w-full max-w-md p-8">
+
+    <!-- Profile Card -->
+    <div class="flex flex-col items-center mb-6">
+      <div class="relative">
+        <img id="profileImage" src="{% static 'media/default_profile.png' %}" 
+             alt="Profile Image" 
+             class="w-28 h-28 rounded-full border-4 border-gray-300 dark:border-gray-700 shadow-sm">
+        <button id="editProfileImageBtn" class="absolute bottom-0 right-0 bg-gray-200 dark:bg-gray-700 p-2 rounded-full shadow hover:bg-gray-300 dark:hover:bg-gray-600">
+          <span class="material-symbols-outlined text-sm">edit</span>
+        </button>
+      </div>
+      <h2 class="text-2xl font-semibold mt-4" id="displayName">John Doe</h2>
+      <p class="text-sm text-gray-500 dark:text-gray-400" id="displayRole">Student | Gujarat Vidyapith</p>
+    </div>
+
+    <!-- Display profile info as text -->
+    <div class="space-y-2 mb-4">
+      <div class="profile-info"><strong>Full Name:</strong> <span id="fullNameText">John Doe</span></div>
+      <div class="profile-info"><strong>Email:</strong> <span id="emailText">john.doe@example.com</span></div>
+      <div class="profile-info"><strong>Username:</strong> <span id="usernameText">johndoe</span></div>
+      <div class="profile-info"><strong>Gender:</strong> <span id="genderText">Male</span></div>
+      <div class="profile-info"><strong>Role:</strong> <span id="roleText">Student</span></div>
+    </div>
+
+    <!-- Update Profile Button -->
+    <button id="updateProfileBtn" class="btn-primary w-full text-white py-2 rounded-lg font-medium">
+      Update Profile
+    </button>
+  </div>
+</main>
+
+<!-- Modal for updating profile -->
+<div id="updateModal" class="modal-bg">
+  <div class="bg-white dark:bg-gray-800 p-6 rounded-xl w-80 shadow-lg flex flex-col items-center">
+    <h3 class="text-lg font-semibold mb-4">Update Profile</h3>
+    <form action="/update-profile/" method="POST" class="modal-form w-full">
+      {% csrf_token %}
+      <input type="text" name="full_name" placeholder="Full Name" value="John Doe" required>
+      <input type="email" name="email" placeholder="Email" value="john.doe@example.com" required>
+      <input type="text" name="username" placeholder="Username" value="johndoe" required>
+      <select name="gender" required>
+        <option value="male" selected>Male</option>
+        <option value="female">Female</option>
+        <option value="other">Other</option>
+      </select>
+      <select name="role" required>
+        <option value="student" selected>Student</option>
+        <option value="faculty">Faculty</option>
+        <option value="staff">Staff</option>
+        <option value="other">Other</option>
+      </select>
+      <div class="flex justify-end gap-2 mt-4">
+        <button type="button" id="closeUpdateModal" class="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700">Cancel</button>
+        <button type="submit" class="btn-primary px-4 py-2 text-white rounded-lg">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal for updating profile image -->
+<div id="imageModal" class="modal-bg">
+  <div class="bg-white dark:bg-gray-800 p-6 rounded-xl w-80 shadow-lg flex flex-col items-center">
+    <h3 class="text-lg font-semibold mb-4">Update Profile Image</h3>
+    <form action="/update-profile-image/" method="POST" enctype="multipart/form-data" class="w-full">
+      {% csrf_token %}
+      <input type="file" name="profile_image" accept="image/*" required>
+      <div class="flex justify-end gap-2 mt-4">
+        <button type="button" id="closeImageModal" class="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700">Cancel</button>
+        <button type="submit" class="btn-primary px-4 py-2 text-white rounded-lg">Upload</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  // Theme toggle
+  function setTheme(theme) {
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+    localStorage.setItem('theme', theme);
+  }
+  function initializeTheme() {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) setTheme(savedTheme);
+    else setTheme(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  }
+  initializeTheme();
+  document.getElementById("themeToggle").addEventListener("click", () => {
+    const current = document.documentElement.classList.contains("dark") ? "dark" : "light";
+    setTheme(current === "dark" ? "light" : "dark");
+  });
+
+  // Modal functionality
+  const updateModal = document.getElementById('updateModal');
+  const updateBtn = document.getElementById('updateProfileBtn');
+  const closeUpdate = document.getElementById('closeUpdateModal');
+
+  updateBtn.addEventListener('click', () => updateModal.classList.add('active'));
+  closeUpdate.addEventListener('click', () => updateModal.classList.remove('active'));
+
+  const imageModal = document.getElementById('imageModal');
+  const editImageBtn = document.getElementById('editProfileImageBtn');
+  const closeImage = document.getElementById('closeImageModal');
+
+  editImageBtn.addEventListener('click', () => imageModal.classList.add('active'));
+  closeImage.addEventListener('click', () => imageModal.classList.remove('active'));
+</script>
+</body>
+</html>
