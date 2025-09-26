@@ -6,4 +6,5 @@ torch
 nltk
 
 # Extra utilities
-setuptools>
+setuptools
+
