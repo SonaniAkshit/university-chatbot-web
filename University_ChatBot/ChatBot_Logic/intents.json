@@ -1,0 +1,156 @@
+{
+  "intents": [
+    {
+      "tag": "greeting",
+      "patterns": [
+        "Hi",
+        "Hello",
+        "Hey there",
+        "Greetings!",
+        "What's up?",
+        "Good morning",
+        "Good afternoon",
+        "Good evening"
+      ],
+      "responses": [
+        "Hello! How can I help you today? 😊",
+        "Hi there! What information are you looking for? 🤔",
+        "Hey! How may I assist you? ✨",
+        "Greetings! I'm here to help you with any questions about Gujarat Vidyapith. 🙏"
+      ]
+    },
+    {
+      "tag": "general_info",
+      "patterns": [
+        "Tell me about Gujarat Vidyapith",
+        "What is the university's motto?",
+        "Who founded the university?",
+        "When was Gujarat Vidyapith established?",
+        "What is the university's mission?"
+      ],
+      "responses": [
+        "Gujarat Vidyapith was founded by Mahatma Gandhi on October 18, 1920. Its motto is 'Sa Vidya Ya Vimuktaye,' which means 'That is knowledge which liberates.' The university's mission is to prepare dedicated workers of character and ability, in line with Gandhian ideals. It was granted the status of a deemed university in 1963. 🎓"
+      ]
+    },
+    {
+      "tag": "admission_info",
+      "patterns": [
+        "How can I get admission?",
+        "What is the admission process?",
+        "Tell me about the application process",
+        "How do I apply for a course?",
+        "What are the steps to apply?"
+      ],
+      "responses": [
+        "The admission process is primarily online through the official university portal. It usually involves an online application, an entrance test (like CUET or GEETA), and sometimes a personal interview. After applying, you will need to upload required documents and pay the application fee. 💻"
+      ]
+    },
+    {
+      "tag": "admission_documents",
+      "patterns": [
+        "What documents are required for admission?",
+        "List the documents for admission",
+        "What do I need to submit with my application?",
+        "Required documents for applying"
+      ],
+      "responses": [
+        "For admission, you generally need to upload your 10th and 12th marksheets, graduation certificate (for PG courses), a valid ID proof, passport-size photos, and a caste certificate if applicable. You should also check the official website for any additional requirements. 📜"
+      ]
+    },
+    {
+      "tag": "admission_exams",
+      "patterns": [
+        "Which entrance exams does the university accept?",
+        "What is CUET?",
+        "Tell me about GEETA",
+        "What exams do I need to take for admission?"
+      ],
+      "responses": [
+        "Gujarat Vidyapith primarily accepts scores from the **CUET** (Common University Entrance Test) for many UG and PG courses. The university also conducts its own test called **GEETA** (Gujarat Vidyapith Eligibility and Efficacy Test for Admission). For Ph.D. admissions, candidates who have qualified in national-level exams like **UGC-NET** or **CSIR-NET** may be exempted from the entrance test. 📝"
+      ]
+    },
+    {
+      "tag": "courses_ug",
+      "patterns": [
+        "What undergraduate courses are available?",
+        "Tell me about B.A. specializations",
+        "List the B.Sc. programs",
+        "Courses after 12th"
+      ],
+      "responses": [
+        "Gujarat Vidyapith offers a variety of undergraduate programs. Some of the popular ones include: **B.A.** with specializations in Gujarati, English, Economics, History, and Gandhian Studies; **B.Sc.** in Microbiology and Environmental Science; and **B.Ed.**. 📚"
+      ]
+    },
+    {
+      "tag": "courses_pg",
+      "patterns": [
+        "What postgraduate courses are offered?",
+        "Tell me about M.A. programs",
+        "List the M.Sc. specializations",
+        "Courses after graduation"
+      ],
+      "responses": [
+        "You can find a wide range of postgraduate programs here. We offer **M.A.** in subjects like Economics, Yoga, and Peace Studies; **M.Sc.** in Microbiology; and professional degrees like **MBA** in Rural Management and **MCA**. 📖"
+      ]
+    },
+    {
+      "tag": "fees",
+      "patterns": [
+        "What are the fees?",
+        "How much does a course cost?",
+        "Tell me about the fee structure",
+        "Fees for undergraduate courses",
+        "Fees for postgraduate courses"
+      ],
+      "responses": [
+        "The fees for most undergraduate and postgraduate courses range from around ₹18,000 to ₹22,000 per year. For specific programs like **B.Ed.** or **Ph.D.**, the total fee can vary. For the most accurate and current fee structure, please refer to the university's official website. 💰"
+      ]
+    },
+    {
+      "tag": "phd_info",
+      "patterns": [
+        "Tell me about Ph.D. programs",
+        "How to apply for a Ph.D.?",
+        "What are the fees for Ph.D.?",
+        "Ph.D. specializations"
+      ],
+      "responses": [
+        "The university offers a variety of **Ph.D.** programs. The eligibility for admission is a Master's degree with a minimum of 55% marks. Admission is based on the university's entrance test or a direct interview if you have qualified for UGC-NET/CSIR-NET. The total fee for a Ph.D. is typically between ₹40,000 and ₹44,000. 🧪"
+      ]
+    },
+    {
+      "tag": "contact",
+      "patterns": [
+        "How can I contact the university?",
+        "What is the university's address?",
+        "Contact information",
+        "Phone number of the admission office",
+        "Email for admissions"
+      ],
+      "responses": [
+        "You can contact the main office at **079-27541148** or **079-40016200**. For specific admissions inquiries, you can use the email address **admission@gujaratvidyapith.org** or visit the main campus at Ashram Road, Navrangpura, Ahmedabad. 📞"
+      ]
+    },
+    {
+      "tag": "campus_life",
+      "patterns": [
+        "Tell me about the campus",
+        "What facilities are available?",
+        "Is there a hostel?",
+        "What is campus life like?"
+      ],
+      "responses": [
+        "The university campus has a number of facilities including libraries, a sports complex, and separate hostels for boys and girls. It has a peaceful, green environment that is well-suited for academic pursuits in a traditional setting. 🌱"
+      ]
+    },
+    {
+      "tag": "not_found",
+      "patterns": [],
+      "responses": [
+        "I'm sorry, I couldn't find an answer to that. Please try rephrasing your question. 🤔",
+        "That's a bit beyond my current knowledge. Can you ask about something else? 🤷‍♂️",
+        "I'm still learning and don't have information on that topic. You might want to check the official Gujarat Vidyapith website for more details. 🙏"
+      ]
+    }
+  ]
+}
