@@ -20,6 +20,12 @@ class User(models.Model):
             ("other", "Other"),
         ],
     )
+    profile_image = models.ImageField(
+        upload_to='profile_images/',  # save directly in media/profile_images/
+        blank=True,
+        null=True,
+        default=None
+    )
 
     def __str__(self):
         return self.username

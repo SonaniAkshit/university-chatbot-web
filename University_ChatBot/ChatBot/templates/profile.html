@@ -21,6 +21,37 @@
 </head>
 <body class="h-screen flex flex-col bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300">
 
+ <!-- Messages -->
+{% if messages %}
+  <div class="m-4 space-y-2" id="messagesContainer">
+    {% for message in messages %}
+      <div class="px-4 py-3 rounded-lg text-sm
+        {% if message.tags == 'success' %} bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100
+        {% elif message.tags == 'error' %} bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100
+        {% elif message.tags == 'warning' %} bg-yellow-100 text-yellow-800 dark:bg-yellow-700 dark:text-yellow-100
+        {% else %} bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100 {% endif %}" 
+        role="alert">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+
+  <script>
+    setTimeout(function() {
+      const container = document.getElementById('messagesContainer');
+      if(container){
+        Array.from(container.children).forEach(alert => {
+          alert.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+          alert.style.opacity = '0';
+          alert.style.transform = 'translateY(-20px)';
+          setTimeout(() => alert.remove(), 500);
+        });
+      }
+    }, 5000); // 5000ms = 5 seconds
+  </script>
+{% endif %}
+
+
 <!-- Header -->
 <header class="bg-white dark:bg-gray-800 border-b px-4 py-3 flex items-center justify-between shadow-sm">
   <div></div>
@@ -55,15 +86,16 @@
     <div class="flex flex-col items-center mb-6">
       <div class="relative">
         <img id="profileImage" 
-             src="{% if profile and profile.profile_image %}{{ profile.profile_image.url }}{% else %}{% static 'media/default_profile.png' %}{% endif %}" 
-             alt="Profile Image" 
-             class="w-28 h-28 rounded-full border-4 border-gray-300 dark:border-gray-700 shadow-sm">
+     src="{% if user_obj.profile_image %}{{ user_obj.profile_image.url }}{% else %}{% static '../media/profile_images/default_profile.png' %}{% endif %}" 
+     alt="Profile Image" 
+     class="w-28 h-28 rounded-full border-4 border-gray-300 dark:border-gray-700 shadow-sm">
+
         <button id="editProfileImageBtn" class="absolute bottom-0 right-0 bg-gray-200 dark:bg-gray-700 p-2 rounded-full shadow hover:bg-gray-300 dark:hover:bg-gray-600">
           <span class="material-symbols-outlined text-sm">edit</span>
         </button>
       </div>
       <h2 class="text-2xl font-semibold mt-4" id="displayName">{{ user_obj.full_name }}</h2>
-      <p class="text-sm text-gray-500 dark:text-gray-400" id="displayRole">{{ profile.role|default:"Student" }} | Gujarat Vidyapith</p>
+      <p class="text-sm text-gray-500 dark:text-gray-400" id="displayRole">{{ user_obj.role }} | Gujarat Vidyapith</p>
     </div>
 
     <!-- Profile Info -->
@@ -71,8 +103,8 @@
       <div class="profile-info"><strong>Full Name:</strong> <span id="fullNameText">{{ user_obj.full_name }}</span></div>
       <div class="profile-info"><strong>Email:</strong> <span id="emailText">{{ user_obj.email }}</span></div>
       <div class="profile-info"><strong>Username:</strong> <span id="usernameText">{{ user_obj.username }}</span></div>
-      <div class="profile-info"><strong>Gender:</strong> <span id="genderText">{{ profile.gender|default:"Male" }}</span></div>
-      <div class="profile-info"><strong>Role:</strong> <span id="roleText">{{ profile.role|default:"Student" }}</span></div>
+      <div class="profile-info"><strong>Gender:</strong> <span id="genderText">{{ user_obj.gender }}</span></div>
+      <div class="profile-info"><strong>Role:</strong> <span id="roleText">{{ user_obj.role }}</span></div>
     </div>
 
     <!-- Update Profile Button -->
@@ -86,22 +118,26 @@
 <div id="updateModal" class="modal-bg">
   <div class="bg-white dark:bg-gray-800 p-6 rounded-xl w-80 shadow-lg flex flex-col items-center">
     <h3 class="text-lg font-semibold mb-4">Update Profile</h3>
-    <form action="/update-profile/" method="POST" class="modal-form w-full">
-      {% csrf_token %}
-      <input type="text" name="full_name" placeholder="Full Name" value="{{ user_obj.get_full_name }}" required>
+    <form action="{% url 'update_profile' %}" method="POST" class="modal-form w-full">
+    {% csrf_token %}
+      <input type="text" name="full_name" placeholder="Full Name" value="{{ user_obj.full_name }}" required>
       <input type="email" name="email" placeholder="Email" value="{{ user_obj.email }}" required>
       <input type="text" name="username" placeholder="Username" value="{{ user_obj.username }}" required>
       <select name="gender" required>
-        <option value="male" {% if profile.gender == "male" %}selected{% endif %}>Male</option>
-        <option value="female" {% if profile.gender == "female" %}selected{% endif %}>Female</option>
-        <option value="other" {% if profile.gender == "other" %}selected{% endif %}>Other</option>
+          <option value="{{ user_obj.gender }}" selected>{{ user_obj.gender|capfirst }}</option>
+          {% if user_obj.gender != "male" %}<option value="male">Male</option>{% endif %}
+          {% if user_obj.gender != "female" %}<option value="female">Female</option>{% endif %}
+          {% if user_obj.gender != "other" %}<option value="other">Other</option>{% endif %}
       </select>
+
       <select name="role" required>
-        <option value="student" {% if profile.role == "student" %}selected{% endif %}>Student</option>
-        <option value="faculty" {% if profile.role == "faculty" %}selected{% endif %}>Faculty</option>
-        <option value="staff" {% if profile.role == "staff" %}selected{% endif %}>Staff</option>
-        <option value="other" {% if profile.role == "other" %}selected{% endif %}>Other</option>
+          <option value="{{ user_obj.role }}" selected>{{ user_obj.role|capfirst }}</option>
+          {% if user_obj.role != "student" %}<option value="student">Student</option>{% endif %}
+          {% if user_obj.role != "faculty" %}<option value="faculty">Faculty</option>{% endif %}
+          {% if user_obj.role != "staff" %}<option value="staff">Staff</option>{% endif %}
+          {% if user_obj.role != "other" %}<option value="other">Other</option>{% endif %}
       </select>
+
       <div class="flex justify-end gap-2 mt-4">
         <button type="button" id="closeUpdateModal" class="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700">Cancel</button>
         <button type="submit" class="btn-primary px-4 py-2 text-white rounded-lg">Save</button>
@@ -114,13 +150,13 @@
 <div id="imageModal" class="modal-bg">
   <div class="bg-white dark:bg-gray-800 p-6 rounded-xl w-80 shadow-lg flex flex-col items-center">
     <h3 class="text-lg font-semibold mb-4">Update Profile Image</h3>
-    <form action="/update-profile-image/" method="POST" enctype="multipart/form-data" class="w-full">
-      {% csrf_token %}
-      <input type="file" name="profile_image" accept="image/*" required>
-      <div class="flex justify-end gap-2 mt-4">
-        <button type="button" id="closeImageModal" class="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700">Cancel</button>
-        <button type="submit" class="btn-primary px-4 py-2 text-white rounded-lg">Upload</button>
-      </div>
+    <form action="{% url 'update_profile_image' %}" method="POST" enctype="multipart/form-data" class="w-full">
+        {% csrf_token %}
+        <input type="file" name="profile_image" accept="image/*">
+        <div class="flex justify-end gap-2 mt-4">
+            <button type="button" id="closeImageModal" class="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700">Cancel</button>
+            <button type="submit" class="btn-primary px-4 py-2 text-white rounded-lg">Upload</button>
+        </div>
     </form>
   </div>
 </div>

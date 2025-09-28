@@ -15,6 +15,8 @@ from .models import User  # your custom User model
 # Import chatbot model and utils
 from django.contrib.auth import logout
 from django.shortcuts import redirect
+from django.views.decorators.csrf import csrf_exempt
+from django.db import DatabaseError
 
 from ChatBot_Logic.model import NeuralNet
 from ChatBot_Logic.nltk_utils import bag_of_words, tokenize
@@ -182,3 +184,73 @@ def profile_view(request):
 def logout_view(request):
     logout(request)  # Clears the session
     return redirect('login')  # Redirects to login page
+
+def update_profile_view(request):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return redirect('login')
+
+    user = get_object_or_404(User, id=user_id)
+
+    if request.method == "POST":
+        full_name = request.POST.get("full_name", "").strip()
+        email = request.POST.get("email", "").strip()
+        username = request.POST.get("username", "").strip()
+        gender = request.POST.get("gender", "").strip()
+        role = request.POST.get("role", "").strip()
+
+        form_errors = {}
+
+        # Basic validations
+        if not full_name:
+            form_errors["full_name"] = "Full name is required."
+        if not email:
+            form_errors["email"] = "Email is required."
+        elif User.objects.filter(email=email).exclude(id=user.id).exists():
+            form_errors["email"] = "Email already exists."
+        if not username:
+            form_errors["username"] = "Username is required."
+        elif User.objects.filter(username=username).exclude(id=user.id).exists():
+            form_errors["username"] = "Username already exists."
+        if not gender:
+            form_errors["gender"] = "Gender is required."
+        if not role:
+            form_errors["role"] = "Role is required."
+
+        if form_errors:
+            return render(request, "profile.html", {
+                "user_obj": user,
+                "profile": getattr(user, 'profile', None),
+                "form_errors": form_errors
+            })
+
+        try:
+            user.full_name = full_name
+            user.email = email
+            user.username = username
+            user.gender = gender
+            user.role = role
+            user.save()
+
+            messages.success(request, "Profile updated successfully.")
+            return redirect("profile")  # or your profile page url name
+        except DatabaseError:
+            messages.error(request, "Something went wrong. Please try again later.")
+
+    return redirect("profile")
+
+def update_profile_image(request):
+    if request.method == "POST" and request.FILES.get("profile_image"):
+        user_id = request.session.get('user_id')
+        if not user_id:
+            messages.error(request, "You need to login first!")
+            return redirect('login')
+        
+        user = User.objects.get(id=user_id)
+        user.profile_image = request.FILES['profile_image']
+        user.save()
+        messages.success(request, "Profile image updated successfully!")
+        return redirect('profile')
+    else:
+        messages.error(request, "No image selected!")
+        return redirect('profile')

@@ -43,6 +43,28 @@
 
 <body class="h-screen flex flex-col bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300">
 
+<!-- Warning Alert if not logged in via session -->
+{% if not request.session.user_id %}
+  <div id="loginAlert" class="alert alert-warning alert-dismissible fade show m-4" role="alert">
+    ⚠️ Please <a href="{% url 'login' %}" class="alert-link">login</a> or 
+    <a href="{% url 'register' %}" class="alert-link">register</a> to save your chat history.
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+  </div>
+
+  <script>
+    // Auto-hide alert after 6 seconds
+    setTimeout(function() {
+        const alert = document.getElementById('loginAlert');
+        if (alert) {
+            alert.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            alert.style.opacity = '0';
+            alert.style.transform = 'translateY(-20px)';
+            setTimeout(() => alert.remove(), 500);
+        }
+    }, 6000);
+  </script>
+{% endif %}
+
 <!-- Welcome Alert -->
 {% if messages %}
   {% for message in messages %}
@@ -121,24 +143,21 @@
 </div>
 
 <script>
-    // Theme toggle functionality
-    function setTheme(theme) {
-        if (theme === 'dark') document.documentElement.classList.add('dark');
-        else document.documentElement.classList.remove('dark');
-        localStorage.setItem('theme', theme);
-    }
-
-    function initializeTheme() {
-        const savedTheme = localStorage.getItem('theme');
-        if (savedTheme) setTheme(savedTheme);
-        else setTheme(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-    }
-    initializeTheme();
-
-    $("#themeToggle").click(function() {
-        const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-        setTheme(currentTheme === 'dark' ? 'light' : 'dark');
-    });
+ // Theme toggle
+  function setTheme(theme) {
+    document.documentElement.classList.toggle('dark', theme==='dark');
+    localStorage.setItem('theme', theme);
+  }
+  function initializeTheme() {
+    const savedTheme = localStorage.getItem('theme');
+    if(savedTheme) setTheme(savedTheme);
+    else setTheme(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark':'light');
+  }
+  initializeTheme();
+  document.getElementById("themeToggle").addEventListener("click", () => {
+    const current = document.documentElement.classList.contains("dark") ? "dark":"light";
+    setTheme(current==="dark" ? "light":"dark");
+  });
 
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
         const savedTheme = localStorage.getItem('theme');
