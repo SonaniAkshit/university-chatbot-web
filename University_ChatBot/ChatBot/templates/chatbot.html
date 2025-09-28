@@ -5,91 +5,90 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GVP ChatBot</title>
-    <link rel="icon" type="image/png" href="{% static 'media/favicon.png' %}" >
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{% static 'media/favicon.png' %}">
+
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = { darkMode: 'class' }
     </script>
+
+    <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- Bootstrap CSS & JS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
     <!-- Google Material Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
     <style>
         /* Typing dots animation */
-        .typing-dots span {
-            display: inline-block;
-            width: 6px;
-            height: 6px;
-            margin: 0 2px;
-            background: currentColor;
-            border-radius: 50%;
-            animation: bounce 1s infinite;
-        }
+        .typing-dots span { display: inline-block; width: 6px; height: 6px; margin: 0 2px; background: currentColor; border-radius: 50%; animation: bounce 1s infinite; }
         .typing-dots span:nth-child(2) { animation-delay: 0.1s; }
         .typing-dots span:nth-child(3) { animation-delay: 0.2s; }
+        @keyframes bounce { 0%, 80%, 100% { transform: scale(0.6); } 40% { transform: scale(1); } }
 
-        @keyframes bounce {
-            0%, 80%, 100% { transform: scale(0.6); }
-            40% { transform: scale(1); }
-        }
+        #user_input:focus { border-radius: 12px; outline: none; box-shadow: 0 0 0 3px rgba(99,102,241,0.5); transition: box-shadow 0.3s ease, border-radius 0.3s ease; }
 
-        /* Input focus animation */
-        #user_input:focus {
-            border-radius: 12px;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.5);
-            transition: box-shadow 0.3s ease, border-radius 0.3s ease;
-        }
-        
-        /* Custom scrollbar styles */
-        #chatbox::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        #chatbox::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        #chatbox::-webkit-scrollbar-thumb {
-            background-color: #d1d5db; /* gray-300 */
-            border-radius: 4px;
-        }
-
-        .dark #chatbox::-webkit-scrollbar-thumb {
-            background-color: #4b5563; /* gray-600 */
-        }
+        #chatbox::-webkit-scrollbar { width: 8px; }
+        #chatbox::-webkit-scrollbar-track { background: transparent; }
+        #chatbox::-webkit-scrollbar-thumb { background-color: #d1d5db; border-radius: 4px; }
+        .dark #chatbox::-webkit-scrollbar-thumb { background-color: #4b5563; }
     </style>
 </head>
 
 <body class="h-screen flex flex-col bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300">
 
+<!-- Welcome Alert -->
+{% if messages %}
+  {% for message in messages %}
+    <div id="welcomeAlert" class="alert alert-success alert-dismissible fade show m-4" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <script>
+      setTimeout(function() {
+          const alert = document.getElementById('welcomeAlert');
+          if (alert) {
+              alert.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+              alert.style.opacity = '0';
+              alert.style.transform = 'translateY(-20px)';
+              setTimeout(() => alert.remove(), 500);
+          }
+      }, 4000);
+    </script>
+  {% endfor %}
+{% endif %}
+
 <!-- Header -->
 <header class="bg-white dark:bg-gray-800 border-b px-4 py-3 flex items-center justify-between shadow-sm">
-    <h1 class="text-lg font-semibold text-gray-800 dark:text-gray-200 text-center flex-1 text-center">
-        GVP University Help Desk AI
-    </h1>
-
+    <h1 class="text-lg font-semibold text-gray-800 dark:text-gray-200 flex-1 text-center">GVP University Help Desk AI</h1>
     <div class="flex items-center gap-3">
-        <!-- Register/User button -->
-        <a href="{% url 'profile' %}" 
-            class="px-3 py-1 rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center">
+       {% if request.session.user_id %}
+         <a href="{% url 'profile' %}" class="px-3 py-1 rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center">
             <span class="material-symbols-outlined">account_circle</span>
         </a>
-
-        <!-- Theme toggle -->
-        <button id="themeToggle" 
-                class="px-3 py-1 rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-gray-700">
+        {% else %}
+        <a href="{% url 'register' %}" class="px-3 py-1 rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center">
+            <span class="material-symbols-outlined">account_circle</span>
+        </a>
+        {% endif %}
+        <button id="themeToggle" class="px-3 py-1 rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-gray-700">
             <span class="material-symbols-outlined">routine</span>
         </button>
     </div>
 </header>
 
-
 <div class="flex flex-1 overflow-hidden">
     <!-- Sidebar -->
     <aside class="hidden md:flex flex-col w-64 border-r bg-white dark:bg-gray-900 p-6">
         <div class="flex flex-col items-center mb-6">
-            <img src="{% static 'media/gvlogo.png' %}" 
-                alt="Gujarat Vidyapith Logo" class="w-20 h-20 mb-2 rounded-full border border-gray-300 dark:border-gray-700 shadow-sm">
+            <img src="{% static 'media/gvlogo.png' %}" alt="Gujarat Vidyapith Logo" class="w-20 h-20 mb-2 rounded-full border border-gray-300 dark:border-gray-700 shadow-sm">
             <h2 class="text-lg font-semibold text-center">Gujarat Vidyapith</h2>
             <p class="text-sm text-gray-500 dark:text-gray-400">Founded by Mahatma Gandhi</p>
             <hr class="w-full my-4 border-gray-300 dark:border-gray-700">
@@ -104,7 +103,7 @@
         <div id="chatbox" class="flex-1 overflow-y-auto p-6 space-y-4">
             <div class="flex justify-start">
                 <div class="bg-gray-100 dark:bg-gray-700 px-4 py-2 rounded-2xl max-w-md text-sm">
-                    Hello! I’m UniBuddy. Ask me anything about the university.
+                    Hello {{ request.session.username|default:"!" }}! I`m UniBuddy. Ask me anything about the university.
                 </div>
             </div>
         </div>
@@ -112,57 +111,38 @@
         <!-- Input Area -->
         <div class="border-t bg-white dark:bg-gray-800 p-3">
             <div class="flex items-center gap-2 border rounded-xl p-1.5 shadow-sm dark:border-gray-700">
-                <textarea id="user_input" rows="1" 
-                    placeholder="Type a message..." 
-                    class="flex-1 resize-none outline-none px-2 py-1 text-sm bg-transparent"></textarea>
-
-                <button id="sendBtn" 
-                    class="bg-[#703737] text-white px-3 py-1.5 rounded-lg text-sm hover:bg-[#582e2e] transition flex items-center justify-center">
+                <textarea id="user_input" rows="1" placeholder="Type a message..." class="flex-1 resize-none outline-none px-2 py-1 text-sm bg-transparent"></textarea>
+                <button id="sendBtn" class="bg-[#703737] text-white px-3 py-1.5 rounded-lg text-sm hover:bg-[#582e2e] transition flex items-center justify-center">
                     <span class="material-symbols-outlined text-base">send</span>
                 </button>
             </div>
         </div>
     </main>
-</div>  
+</div>
 
 <script>
     // Theme toggle functionality
     function setTheme(theme) {
-        if (theme === 'dark') {
-            document.documentElement.classList.add('dark');
-        } else {
-            document.documentElement.classList.remove('dark');
-        }
+        if (theme === 'dark') document.documentElement.classList.add('dark');
+        else document.documentElement.classList.remove('dark');
         localStorage.setItem('theme', theme);
     }
 
-    // Check system preference or saved theme
     function initializeTheme() {
         const savedTheme = localStorage.getItem('theme');
-        if (savedTheme) {
-            setTheme(savedTheme);
-        } else {
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            setTheme(prefersDark ? 'dark' : 'light');
-        }
+        if (savedTheme) setTheme(savedTheme);
+        else setTheme(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
     }
-
-    // Initialize theme on page load
     initializeTheme();
 
-    // Toggle theme on button click
     $("#themeToggle").click(function() {
         const currentTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        setTheme(newTheme);
+        setTheme(currentTheme === 'dark' ? 'light' : 'dark');
     });
 
-    // Listen for system theme changes
     window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
         const savedTheme = localStorage.getItem('theme');
-        if (!savedTheme) { // Only update if user hasn't manually set a theme
-            setTheme(e.matches ? 'dark' : 'light');
-        }
+        if (!savedTheme) setTheme(e.matches ? 'dark' : 'light');
     });
 
     function addUserMessage(text) {
@@ -177,15 +157,7 @@
     }
 
     function addBotMessage(text) {
-        // Simple Markdown renderer
-        function renderMarkdown(mdText) {
-            // Replace bold markdown with HTML <strong> tag
-            mdText = mdText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-            // Add more render rules here if needed
-            return mdText;
-        }
-
-        const formattedText = renderMarkdown(text);
+        const formattedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
         const messageHtml = `
             <div class="flex justify-start">
                 <div class="relative group">
@@ -200,17 +172,14 @@
         `;
         $("#chatbox").append(messageHtml);
         $("#chatbox").scrollTop($("#chatbox")[0].scrollHeight);
-        
-        // Attach click event listener to the new copy button
+
         const copyButton = $("#chatbox").find('.copy-btn').last();
         copyButton.click(function() {
             navigator.clipboard.writeText(text).then(() => {
                 const copyIcon = $(this).find('.material-symbols-outlined');
                 copyIcon.text('done');
                 setTimeout(() => copyIcon.text('content_copy'), 2000);
-            }).catch(err => {
-                console.error('Failed to copy text: ', err);
-            });
+            }).catch(err => console.error('Failed to copy text: ', err));
         });
     }
 
@@ -231,26 +200,17 @@
 
     function sendMessage() {
         var userText = $("#user_input").val();
-        if (userText.trim() === "") return;
-
+        if (!userText.trim()) return;
         addUserMessage(userText);
         $("#user_input").val("");
-
         showTypingIndicator();
-
         $.get("/get/", { msg: userText }).done(function(data) {
-            setTimeout(function() {
-                removeTypingIndicator();
-                addBotMessage(data.reply);
-            }, 1500); // 1.5s delay for typing effect
+            setTimeout(() => { removeTypingIndicator(); addBotMessage(data.reply); }, 1500);
         });
     }
 
     $("#user_input").keypress(function(e) {
-        if (e.which === 13 && !e.shiftKey) {
-            sendMessage();
-            return false;
-        }
+        if (e.which === 13 && !e.shiftKey) { sendMessage(); return false; }
     });
     $("#sendBtn").click(sendMessage);
 

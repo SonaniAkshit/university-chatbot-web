@@ -2,177 +2,192 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Registration | GVP ChatBot</title>
-  <link rel="icon" type="image/png" href="{% static 'media/favicon.png' %}">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = { darkMode: 'class' }
-  </script>
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
-  <style>
-    /* Smooth animation for inputs and selects */
-    .animated-input {
-      transition: all 0.3s ease-in-out;
-    }
-
-    .animated-input:focus {
-      outline: none;
-      border: 1px solid #703737;
-      box-shadow: 0 0 0 3px rgba(112, 55, 55, 0.3);
-      transform: scale(1.02);
-    }
-
-    /* Register button hover */
-    .btn-register {
-      background-color: #703737;
-      transition: all 0.3s ease;
-    }
-    .btn-register:hover {
-      background-color: #8c4b4b;
-      transform: scale(1.05);
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registration | GVP ChatBot</title>
+<link rel="icon" type="image/png" href="{% static 'media/favicon.png' %}">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config = { darkMode: 'class' }</script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+<style>
+.animated-input { transition: all 0.3s ease-in-out; }
+.animated-input:focus { outline:none; border:1px solid #703737; box-shadow:0 0 0 3px rgba(112,55,55,0.3); transform:scale(1.02);}
+.input-error { border-color: #dc3545 !important; box-shadow:0 0 0 3px rgba(220,53,69,0.25);}
+.error-text { color: #dc3545; font-size:0.875rem; margin-top:0.25rem; display:none;}
+.btn-register { background-color: #703737; transition: all 0.3s ease;}
+.btn-register:hover { background-color: #8c4b4b; transform: scale(1.05);}
+</style>
 </head>
-
 <body class="h-screen flex flex-col bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300">
 
-<!-- Header -->
 <header class="bg-white dark:bg-gray-800 border-b px-4 py-3 flex items-center justify-between shadow-sm">
   <div></div>
   <h1 class="text-lg font-semibold text-gray-800 dark:text-gray-200 text-center">
     GVP University Help Desk AI Registration
   </h1>
-   <div class="flex items-center gap-3">
-    <!-- Chatbot/Home button -->
-   <a href="{% url 'chatbot_home' %}" 
-      class="px-3 py-1 rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center">
+  <div class="flex items-center gap-3">
+    <a href="{% url 'chatbot_home' %}" class="px-3 py-1 rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center">
       <span class="material-symbols-outlined">robot_2</span>
     </a>
-
-    <!-- Theme toggle -->
-    <button id="themeToggle" 
-            class="px-3 py-1 rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-gray-700">
+    <button id="themeToggle" class="px-3 py-1 rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-gray-700">
       <span class="material-symbols-outlined">routine</span>
     </button>
   </div>
 </header>
 
-<!-- Registration Section -->
 <main class="flex-1 flex items-center justify-center p-6">
   <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg w-full max-w-md p-8">
 
-    <!-- Logo + Title -->
     <div class="flex flex-col items-center mb-6">
-      <img src="{% static 'media/gvlogo.png' %}" 
-           alt="Gujarat Vidyapith Logo" 
-           class="w-20 h-20 mb-3 rounded-full border border-gray-300 dark:border-gray-700 shadow-sm">
+      <img src="{% static 'media/gvlogo.png' %}" alt="Gujarat Vidyapith Logo" class="w-20 h-20 mb-3 rounded-full border border-gray-300 dark:border-gray-700 shadow-sm">
       <h2 class="text-2xl font-semibold text-center">Gujarat Vidyapith</h2>
       <p class="text-sm text-gray-500 dark:text-gray-400">Founded by Mahatma Gandhi</p>
     </div>
 
-    <!-- Form -->
-    <form action="/register/" method="POST" class="space-y-4">
+    <!-- Alert for database errors -->
+    <div id="alertBox" class="hidden p-3 mb-4 rounded text-white font-medium"></div>
+
+    <form id="registrationForm" action="/register/" method="POST" class="space-y-4">
       {% csrf_token %}
 
-      <!-- Full Name + Username -->
       <div class="grid grid-cols-2 gap-4">
         <div>
           <label for="full_name" class="block text-sm font-medium mb-1">Full Name</label>
-          <input type="text" id="full_name" name="full_name" required
-            class="animated-input w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent text-sm">
+          <input type="text" id="full_name" name="full_name" class="animated-input w-full px-3 py-2 rounded-lg border dark:border-gray-700 bg-transparent text-sm">
+          <p class="error-text" id="full_name_error">Full name is required.</p>
         </div>
         <div>
           <label for="username" class="block text-sm font-medium mb-1">Username</label>
-          <input type="text" id="username" name="username" required
-            class="animated-input w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent text-sm">
+          <input type="text" id="username" name="username" class="animated-input w-full px-3 py-2 rounded-lg border dark:border-gray-700 bg-transparent text-sm">
+          <p class="error-text" id="username_error">Username is required.</p>
         </div>
       </div>
 
-      <!-- Email -->
       <div>
-          <label for="email" class="block text-sm font-medium mb-1">Email</label>
-          <input type="email" id="email" name="email" required
-            class="animated-input w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent text-sm">
+        <label for="email" class="block text-sm font-medium mb-1">Email</label>
+        <input type="email" id="email" name="email" class="animated-input w-full px-3 py-2 rounded-lg border dark:border-gray-700 bg-transparent text-sm">
+        <p class="error-text" id="email_error">Enter a valid email.</p>
       </div>
 
-      <!-- Password + Confirm Password -->
       <div class="grid grid-cols-2 gap-4">
         <div>
           <label for="password" class="block text-sm font-medium mb-1">Password</label>
-          <input type="password" id="password" name="password" required
-            class="animated-input w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent text-sm">
+          <input type="password" id="password" name="password" class="animated-input w-full px-3 py-2 rounded-lg border dark:border-gray-700 bg-transparent text-sm">
+          <p class="error-text" id="password_error">Password must be at least 6 characters.</p>
         </div>
         <div>
           <label for="confirm_password" class="block text-sm font-medium mb-1">Confirm Password</label>
-          <input type="password" id="confirm_password" name="confirm_password" required
-            class="animated-input w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent text-sm">
+          <input type="password" id="confirm_password" name="confirm_password" class="animated-input w-full px-3 py-2 rounded-lg border dark:border-gray-700 bg-transparent text-sm">
+          <p class="error-text" id="confirm_password_error">Passwords must match.</p>
         </div>
       </div>
 
-      <!-- Gender + Role -->
       <div class="grid grid-cols-2 gap-4">
         <div>
           <label for="gender" class="block text-sm font-medium mb-1">Gender</label>
-          <select id="gender" name="gender" required
-            class="animated-input w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent text-sm">
-            <option value="" disabled selected>Select Gender</option>
+          <select id="gender" name="gender" class="animated-input w-full px-3 py-2 rounded-lg border dark:border-gray-700 bg-transparent text-sm">
+            <option value="" selected>Select Gender</option>
             <option value="male">Male</option>
             <option value="female">Female</option>
             <option value="other">Other</option>
           </select>
+          <p class="error-text" id="gender_error">Select a gender.</p>
         </div>
         <div>
           <label for="role" class="block text-sm font-medium mb-1">Role</label>
-          <select id="role" name="role" required
-            class="animated-input w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-transparent text-sm">
-            <option value="" disabled selected>Select Role</option>
+          <select id="role" name="role" class="animated-input w-full px-3 py-2 rounded-lg border dark:border-gray-700 bg-transparent text-sm">
+            <option value="" selected>Select Role</option>
             <option value="student">Student</option>
             <option value="parent">Parent</option>
             <option value="faculty">Faculty</option>
             <option value="staff">Staff</option>
             <option value="other">Other</option>
           </select>
+          <p class="error-text" id="role_error">Select a role.</p>
         </div>
       </div>
 
-      <button type="submit"
-        class="btn-register w-full text-white py-2 rounded-lg font-medium">
-        Register
-      </button>
+      <button type="submit" class="btn-register w-full text-white py-2 rounded-lg font-medium">Register</button>
     </form>
 
-    <!-- Footer -->
-  <p class="text-center text-sm mt-4 text-gray-500 dark:text-gray-400">
-    Already have an account? 
-    <a href="{% url 'login' %}" class="text-blue-600 hover:underline">Login</a>
-  </p>
+    <p class="text-center text-sm mt-4 text-gray-500 dark:text-gray-400">
+      Already have an account? 
+      <a href="{% url 'login' %}" class="text-blue-600 hover:underline">Login</a>
+    </p>
 
   </div>
 </main>
 
 <script>
-  function setTheme(theme) {
-    document.documentElement.classList.toggle('dark', theme === 'dark');
-    localStorage.setItem('theme', theme);
-  }
+function setTheme(theme) {
+  document.documentElement.classList.toggle('dark', theme === 'dark');
+  localStorage.setItem('theme', theme);
+}
+function initializeTheme() {
+  const savedTheme = localStorage.getItem('theme');
+  setTheme(savedTheme || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'));
+}
+initializeTheme();
+document.getElementById("themeToggle").addEventListener("click", () => {
+  const current = document.documentElement.classList.contains("dark") ? "dark" : "light";
+  setTheme(current === "dark" ? "light" : "dark");
+});
 
-  function initializeTheme() {
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme) {
-      setTheme(savedTheme);
+// Dynamic JS validation
+const form = document.getElementById('registrationForm');
+const fields = ['full_name','username','email','password','confirm_password','gender','role'];
+
+const validators = {
+  full_name: v => v.trim() !== '',
+  username: v => v.trim() !== '',
+  email: v => /^\S+@\S+\.\S+$/.test(v),
+  password: v => v.length >= 6,
+  confirm_password: v => v === document.getElementById('password').value,
+  gender: v => v !== '',
+  role: v => v !== ''
+};
+
+fields.forEach(id=>{
+  const input = document.getElementById(id);
+  const error = document.getElementById(id+'_error');
+  input.addEventListener('blur', ()=>{
+    if(!validators[id](input.value)){
+      input.classList.add('input-error');
+      error.style.display = 'block';
     } else {
-      setTheme(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      input.classList.remove('input-error');
+      error.style.display = 'none';
     }
-  }
-
-  initializeTheme();
-
-  document.getElementById("themeToggle").addEventListener("click", () => {
-    const current = document.documentElement.classList.contains("dark") ? "dark" : "light";
-    setTheme(current === "dark" ? "light" : "dark");
   });
+});
+
+form.addEventListener('submit', e=>{
+  let valid = true;
+  fields.forEach(id=>{
+    const input = document.getElementById(id);
+    const error = document.getElementById(id+'_error');
+    if(!validators[id](input.value)){
+      input.classList.add('input-error');
+      error.style.display = 'block';
+      valid = false;
+    } else {
+      input.classList.remove('input-error');
+      error.style.display = 'none';
+    }
+  });
+  if(!valid) e.preventDefault();
+});
+
+// Show database error message if exists
+const alertBox = document.getElementById('alertBox');
+{% if db_error %}
+  alertBox.textContent = "{{ db_error }}";
+  alertBox.className = "bg-red-500 p-3 mb-4 rounded text-white font-medium";
+  alertBox.classList.remove('hidden');
+  setTimeout(() => {
+    alertBox.classList.add('hidden');
+  }, 4000);
+{% endif %}
 </script>
 
 </body>
