@@ -5,7 +5,8 @@ import torch
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.conf import settings
-from .models import User
+from .models import User, ChatMessage
+from django.shortcuts import get_object_or_404
 from django.db import DatabaseError
 from django.contrib import messages
 from django.shortcuts import render, redirect
@@ -254,3 +255,86 @@ def update_profile_image(request):
     else:
         messages.error(request, "No image selected!")
         return redirect('profile')
+    
+def get_response(request):
+    user_msg = request.GET.get("msg", "").strip()
+    if not user_msg:
+        return JsonResponse({"reply": "Please type something."})
+
+    # Get logged-in user
+    user_id = request.session.get('user_id')
+    user = None
+    username = None
+    if user_id:
+        user = get_object_or_404(User, id=user_id)
+        username = user.username
+        # Save user message
+        ChatMessage.objects.create(
+            user=user,
+            username=username,
+            message=user_msg,
+            is_bot=False
+        )
+
+    # Chatbot logic
+    sentence_tokens = tokenize(user_msg)
+    X = bag_of_words(sentence_tokens, all_words)
+    X_tensor = torch.from_numpy(X).unsqueeze(0).to(dtype=torch.float32)
+
+    with torch.no_grad():
+        output = model(X_tensor)
+        _, predicted = torch.max(output, dim=1)
+        probs = torch.softmax(output, dim=1)
+        prob = probs[0][predicted.item()].item()
+
+    tag = tags[predicted.item()]
+    if prob > 0.50:
+        for intent in intents["intents"]:
+            if tag == intent["tag"]:
+                bot_reply = random.choice(intent["responses"])
+                # Save bot response
+                if user:
+                    ChatMessage.objects.create(
+                        user=user,
+                        username=username,
+                        message=bot_reply,
+                        is_bot=True
+                    )
+                return JsonResponse({"reply": bot_reply})
+
+    bot_reply = "I’m not sure I understand. Can you rephrase?"
+    if user:
+        ChatMessage.objects.create(
+            user=user,
+            username=username,
+            message=bot_reply,
+            is_bot=True
+        )
+
+    return JsonResponse({"reply": bot_reply})
+
+def chat_history_view(request):
+    username = request.session.get('username')
+    if not username:
+        return redirect('login')  # redirect if not logged in
+
+    # Fetch chat history for this session username
+    chat_history = ChatMessage.objects.filter(username=username).order_by('timestamp')
+
+    return render(request, "chat_history.html", {"chat_history": chat_history})
+
+
+
+def clear_chat_view(request):
+    user_id = request.session.get('user_id')
+    if user_id:
+        user = get_object_or_404(User, id=user_id)
+        ChatMessage.objects.filter(user=user).delete()
+        return JsonResponse({"status": "success"})
+    return JsonResponse({"status": "failed"}, status=403)
+
+def clear_chat_history(request):
+    username = request.session.get('username')
+    if username:
+        ChatMessage.objects.filter(username=username).delete()
+    return redirect('chat_history')

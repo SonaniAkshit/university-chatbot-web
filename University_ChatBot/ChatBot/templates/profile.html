@@ -121,7 +121,7 @@
     <form action="{% url 'update_profile' %}" method="POST" class="modal-form w-full">
     {% csrf_token %}
       <input type="text" name="full_name" placeholder="Full Name" value="{{ user_obj.full_name }}" required>
-      <input type="email" name="email" placeholder="Email" value="{{ user_obj.email }}" required>
+      <input type="email" name="email" placeholder="Email" value="{{ user_obj.email }}" readonly>
       <input type="text" name="username" placeholder="Username" value="{{ user_obj.username }}" required>
       <select name="gender" required>
           <option value="{{ user_obj.gender }}" selected>{{ user_obj.gender|capfirst }}</option>

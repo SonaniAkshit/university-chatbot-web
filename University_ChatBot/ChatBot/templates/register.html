@@ -179,15 +179,15 @@ form.addEventListener('submit', e=>{
 });
 
 // Show database error message if exists
-const alertBox = document.getElementById('alertBox');
-{% if db_error %}
-  alertBox.textContent = "{{ db_error }}";
-  alertBox.className = "bg-red-500 p-3 mb-4 rounded text-white font-medium";
-  alertBox.classList.remove('hidden');
-  setTimeout(() => {
-    alertBox.classList.add('hidden');
-  }, 4000);
-{% endif %}
+// const alertBox = document.getElementById('alertBox');
+// {% if db_error %}
+//   alertBox.textContent = "{{ db_error }}";
+//   alertBox.className = "bg-red-500 p-3 mb-4 rounded text-white font-medium";
+//   alertBox.classList.remove('hidden');
+//   setTimeout(() => {
+//     alertBox.classList.add('hidden');
+//   }, 4000);
+// {% endif %}
 </script>
 
 </body>
