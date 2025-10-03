@@ -2,6 +2,8 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+
+    #user
     path('', views.chatbot_view, name='chatbot_home'),
     path('get/', views.get_response, name='get_response'),
     path('history/', views.chat_history_view, name='chat_history'),
@@ -13,4 +15,10 @@ urlpatterns = [
     path('profile/update/', views.update_profile_view, name='update_profile'),
     path('profile/update-image/', views.update_profile_image, name='update_profile_image'),
     path('clear_history/', views.clear_chat_history, name='clear_chat_history'),
+
+    #admin
+    path('adminpanel/', views.admin_dashboard, name='admin_panel'),
+    path('adminlogin/', views.admin_login, name='admin_login'),
+    path('adminusers/', views.admin_users, name='admin_users'),
+     path('adminlogout/', views.admin_logout, name='admin_logout'),
 ]

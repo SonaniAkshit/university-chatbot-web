@@ -4,8 +4,9 @@ import random
 import torch
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
+from django.utils import timezone
 from django.conf import settings
-from .models import User, ChatMessage
+from .models import User, ChatMessage, AdminUser
 from django.shortcuts import get_object_or_404
 from django.db import DatabaseError
 from django.contrib import messages
@@ -130,9 +131,10 @@ def register_view(request):
 
 from django.contrib import messages  # make sure this is imported
 
+
 def login_view(request):
     if request.method == "POST":
-        identifier = request.POST.get("login_identifier").strip()  # username or email
+        identifier = request.POST.get("login_identifier", "").strip()  # username or email
         password = request.POST.get("password")
 
         try:
@@ -148,22 +150,25 @@ def login_view(request):
             messages.error(request, "Something went wrong. Please try again later.")
             return render(request, "login.html", {"form_data": request.POST})
 
-        # Check password directly
+        # Check password directly (⚠️ You should hash later, this is unsafe in production)
         if user.password != password:
             messages.error(request, "Invalid username/email or password.")
             return render(request, "login.html", {"form_data": request.POST})
 
-        # Login successful: create session
-        request.session['user_id'] = user.id
-        request.session['username'] = user.username
+        # ✅ Update status to active
+        user.status = "active"
+        user.save(update_fields=["status"])
 
-        # Set welcome message
+        # Login successful: create session
+        request.session["user_id"] = user.id
+        request.session["username"] = user.username
+
+        # Welcome message
         messages.success(request, f"Welcome, {user.username}! You are now logged in.")
 
         return redirect("chatbot_home")
 
     return render(request, "login.html")
-
 
 def profile_view(request):
     user_id = request.session.get('user_id')  # session user ID
@@ -183,8 +188,17 @@ def profile_view(request):
     return render(request, "profile.html", context)
 
 def logout_view(request):
+    user_id = request.session.get("user_id")  # Get current logged-in user id
+    if user_id:
+        try:
+            user = User.objects.get(id=user_id)
+            user.status = "inactive"  # Set status to inactive
+            user.save(update_fields=["status"])
+        except User.DoesNotExist:
+            pass  # User not found, ignore
+
     logout(request)  # Clears the session
-    return redirect('login')  # Redirects to login page
+    return redirect("login")  # Redirects to login page
 
 def update_profile_view(request):
     user_id = request.session.get('user_id')
@@ -338,3 +352,95 @@ def clear_chat_history(request):
     if username:
         ChatMessage.objects.filter(username=username).delete()
     return redirect('chat_history')
+
+
+# def chatbot_admin_index(request):
+#     return render(request, 'chatbotadmin/index.html')
+
+
+def admin_login(request):
+    if request.method == "POST":
+        identifier = request.POST.get("login_identifier", "").strip()  # username or email
+        password = request.POST.get("password")
+
+        try:
+            # Lookup admin by username or email
+            try:
+                admin = AdminUser.objects.get(username=identifier)
+            except AdminUser.DoesNotExist:
+                admin = AdminUser.objects.get(email=identifier)
+        except AdminUser.DoesNotExist:
+            messages.error(request, "Invalid username/email or password.")
+            return render(request, "chatbotadmin/login.html", {"form_data": request.POST})
+        except DatabaseError:
+            messages.error(request, "Something went wrong. Please try again later.")
+            return render(request, "chatbotadmin/login.html", {"form_data": request.POST})
+
+        # Check password (⚠️ Plain text for now; hash recommended in production)
+        if admin.password != password:
+            messages.error(request, "Invalid username/email or password.")
+            return render(request, "chatbotadmin/login.html", {"form_data": request.POST})
+
+        # Login successful: set session
+        request.session["admin_id"] = admin.id
+        request.session["admin_username"] = admin.username
+
+        # Success message
+        messages.success(request, f"Welcome, {admin.username}! You are now logged in.")
+
+        return redirect("admin_panel")  # Redirect to your admin dashboard
+
+    return render(request, "chatbotadmin/login.html")
+
+def admin_users(request):
+    users = User.objects.all().order_by('-joined_date')
+    context = {
+        'users': users,
+        'students_count': User.objects.filter(role='student').count(),
+        'parents_count': User.objects.filter(role='parent').count(),
+        'faculty_count': User.objects.filter(role='faculty').count(),
+        'others_count': User.objects.filter(role__in=['staff','other']).count(),
+    }
+    return render(request, 'chatbotadmin/users.html', context)
+    # return render(request, "chatbotadmin/users.html", {"users": users})
+
+def admin_dashboard(request):
+
+    # Check if admin is logged in
+    if not request.session.get('admin_username'):
+        return redirect('admin_login')  # Redirect to login if session not found
+
+    admin_username = request.session.get('admin_username')
+    # Proceed with your admin panel logic
+    
+    # Count by category
+    students_count = User.objects.filter(role='student').count()
+    parents_count = User.objects.filter(role='parent').count()
+    faculty_count = User.objects.filter(role='faculty').count()
+    others_count = User.objects.filter(role__in=['staff','other']).count()
+    
+    total_count = students_count + parents_count + faculty_count + others_count
+
+    # Recent users - last 5 registered
+    recent_users = User.objects.order_by('-joined_date')[:5]
+
+    context = {
+        'students_count': students_count,
+        'parents_count': parents_count,
+        'faculty_count': faculty_count,
+        'others_count': others_count,
+        'total_count': total_count,
+        'recent_users': recent_users,
+    }
+    return render(request, 'chatbotadmin/index.html', context)
+
+def admin_logout(request):
+    # Clear admin session
+    request.session.pop('admin_id', None)
+    request.session.pop('admin_username', None)
+    
+    # Optional: Add a message
+    messages.success(request, "You have been successfully logged out.")
+    
+    # Redirect to admin login page
+    return redirect('admin_login')
