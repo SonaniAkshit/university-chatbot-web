@@ -20,5 +20,8 @@ urlpatterns = [
     path('adminpanel/', views.admin_dashboard, name='admin_panel'),
     path('adminlogin/', views.admin_login, name='admin_login'),
     path('adminusers/', views.admin_users, name='admin_users'),
-     path('adminlogout/', views.admin_logout, name='admin_logout'),
+    path('adminlogout/', views.admin_logout, name='admin_logout'),
+    path("admin/chat-history/", views.admin_chat_history, name="admin_chat_history"),
+    path("admin/get_user_chat_history/<int:user_id>/", views.get_user_chat_history, name="get_user_chat_history"),
+
 ]

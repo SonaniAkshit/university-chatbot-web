@@ -2,18 +2,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Chat History - UniBuddy</title>
 
 <!-- Tailwind CSS -->
 <script src="https://cdn.tailwindcss.com"></script>
 <script>tailwind.config = { darkMode: 'class' }</script>
 
-<!-- Bootstrap CSS & JS -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 <!-- SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
@@ -46,17 +43,48 @@
 <body class="bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300">
 
 <header class="bg-white dark:bg-gray-800 border-b px-4 py-3 flex items-center justify-between shadow-sm">
-    <h1 class="text-lg font-semibold text-gray-800 dark:text-gray-200 flex-1 text-center">Your Chat History</h1>
-    <div class="flex gap-2 items-center">
-        <a href="{% url 'chatbot_home' %}" class="px-3 py-1 rounded-lg bg-[#703737] text-white text-sm hover:bg-[#582e2e] transition">Back to Chat</a>
-        <button id="clear-history-btn" class="px-3 py-1 rounded-lg bg-red-600 text-white text-sm hover:bg-red-700 transition">Clear Chat History</button>
-        <button id="themeToggle" class="px-3 py-1 rounded-lg bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-100 text-sm hover:bg-gray-300 dark:hover:bg-gray-600 transition">Toggle Theme</button>
+    <h1 class="text-lg font-semibold text-gray-800 dark:text-gray-200 flex-1 text-center">Your Chat History📃</h1>
+    <div class="flex items-center gap-3">
+        <a href="{% url 'chatbot_home' %}" 
+           class="px-3 py-1 rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center">
+            <span class="material-symbols-outlined">robot_2</span>
+        </a>
+
+        {% if request.session.user_id %}
+            <a href="{% url 'profile' %}" class="px-3 py-1 rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center">
+                <span class="material-symbols-outlined">account_circle</span>
+            </a>
+        {% else %}
+            <a href="{% url 'register' %}" class="px-3 py-1 rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center">
+                <span class="material-symbols-outlined">account_circle</span>
+            </a>
+        {% endif %}
+
+        <button id="themeToggle" class="px-3 py-1 rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-gray-700">
+            <span class="material-symbols-outlined">routine</span>
+        </button>
     </div>
 </header>
+
+{% if messages %}
+<div class="p-4">
+    {% for message in messages %}
+        <div class="mb-2 px-4 py-2 rounded-lg 
+            {% if message.tags == 'success' %} bg-green-100 text-green-700 
+            {% elif message.tags == 'error' %} bg-red-100 text-red-700 
+            {% else %} bg-gray-100 text-gray-700 {% endif %}">
+            {{ message }}
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
 
 <main class="flex-1 flex flex-col">
     <div id="chatbox" class="flex-1 flex flex-col space-y-3 p-3">
         {% if chat_history %}
+        <div class="flex gap-2 items-center">
+            <button id="clear-history-btn" class="px-3 py-1 rounded-lg bg-red-600 text-white text-sm hover:bg-red-700 transition">Clear Chat History🧹</button>
+        </div>
             {% for chat in chat_history %}
                 {% if chat.is_bot %}
                     <div class="flex justify-start">
@@ -75,8 +103,8 @@
 </main>
 
 <script>
-// Clear chat history
-document.getElementById('clear-history-btn').addEventListener('click', function() {
+// Clear chat history (confirmation)
+document.getElementById('clear-history-btn')?.addEventListener('click', function() {
     Swal.fire({
         title: 'Are you sure?',
         text: "This will delete all your chat history permanently!",
@@ -92,13 +120,17 @@ document.getElementById('clear-history-btn').addEventListener('click', function(
     });
 });
 
-// Dark/Light Theme Toggle
-function setTheme(theme) {
-    document.documentElement.classList.toggle('dark', theme==='dark');
+/* ------------------------
+   Dark/Light Theme (reference code)
+   ------------------------
+   This is the exact pattern from your reference.
+*/
+function setTheme(theme){
+    document.documentElement.classList.toggle('dark', theme === 'dark');
     localStorage.setItem('theme', theme);
 }
 
-function initializeTheme() {
+function initializeTheme(){
     const savedTheme = localStorage.getItem('theme');
     if(savedTheme) setTheme(savedTheme);
     else setTheme(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark':'light');
@@ -111,9 +143,14 @@ document.getElementById("themeToggle").addEventListener("click", () => {
     setTheme(current === "dark" ? "light" : "dark");
 });
 
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+    const savedTheme = localStorage.getItem('theme');
+    if(!savedTheme) setTheme(e.matches ? 'dark' : 'light');
+});
+
 // Auto-scroll chat to bottom
 const chatbox = document.getElementById('chatbox');
-chatbox.scrollTop = chatbox.scrollHeight;
+if (chatbox) chatbox.scrollTop = chatbox.scrollHeight;
 </script>
 
 </body>

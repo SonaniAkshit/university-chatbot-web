@@ -351,8 +351,11 @@ def clear_chat_history(request):
     username = request.session.get('username')
     if username:
         ChatMessage.objects.filter(username=username).delete()
-    return redirect('chat_history')
+        messages.success(request, "Your chat history has been cleared successfully.")
+    else:
+        messages.error(request, "No active session found. Please log in again.")
 
+    return redirect('chat_history')
 
 # def chatbot_admin_index(request):
 #     return render(request, 'chatbotadmin/index.html')
@@ -444,3 +447,33 @@ def admin_logout(request):
     
     # Redirect to admin login page
     return redirect('admin_login')
+
+def admin_chat_history(request):
+    # Only allow if admin is logged in
+    if not request.session.get('admin_username'):
+        return redirect('admin_login')
+
+    users = User.objects.all().order_by('-joined_date')
+
+    # Get all usernames that have chat messages
+    chat_usernames = ChatMessage.objects.values_list('username', flat=True).distinct()
+
+    return render(request, "chatbotadmin/chat_history.html", {
+        "users": users,
+        "chat_usernames": list(chat_usernames),  # pass as a list
+    })
+
+def get_user_chat_history(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    chats = ChatMessage.objects.filter(user=user).order_by("timestamp")
+
+    data = []
+    for chat in chats:
+        data.append({
+            "message": chat.message,
+            "is_bot": chat.is_bot,
+            "timestamp": chat.timestamp.strftime("%Y-%m-%d %H:%M:%S")
+        })
+
+    return JsonResponse({"username": user.username, "full_name": user.full_name, "chats": data})
+

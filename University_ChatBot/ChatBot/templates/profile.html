@@ -133,6 +133,7 @@
       <select name="role" required>
           <option value="{{ user_obj.role }}" selected>{{ user_obj.role|capfirst }}</option>
           {% if user_obj.role != "student" %}<option value="student">Student</option>{% endif %}
+          {% if user_obj.role != "faculty" %}<option value="parent">Parent</option>{% endif %}
           {% if user_obj.role != "faculty" %}<option value="faculty">Faculty</option>{% endif %}
           {% if user_obj.role != "staff" %}<option value="staff">Staff</option>{% endif %}
           {% if user_obj.role != "other" %}<option value="other">Other</option>{% endif %}
