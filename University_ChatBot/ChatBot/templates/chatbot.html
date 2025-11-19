@@ -2,35 +2,111 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GVP ChatBot</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>GVP ChatBot — UniBuddy</title>
 <link rel="icon" type="image/png" href="{% static 'media/favicon.png' %}">
+
+<!-- Tailwind -->
 <script src="https://cdn.tailwindcss.com"></script>
 <script>tailwind.config = { darkMode: 'class' }</script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Icons & utils -->
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Markdown parser + sanitizer -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@2.4.0/dist/purify.min.js"></script>
+
 <style>
-/* Scrollbar */
+/* Layout basics */
+body { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
+#chatbox { scrollbar-width: thin; scrollbar-color: rgba(0,0,0,0.25) transparent; }
+
+/* Scrollbar for webkit */
 #chatbox::-webkit-scrollbar{width:8px;}
 #chatbox::-webkit-scrollbar-track{background:transparent;}
 #chatbox::-webkit-scrollbar-thumb{background-color:#d1d5db;border-radius:4px;}
 .dark #chatbox::-webkit-scrollbar-thumb{background-color:#4b5563;}
 
-/* Messages */
-.user-message{background-color:#703737;color:white;padding:8px 12px;border-radius:20px;max-width:70%;word-wrap:break-word; display:flex; align-items:center; gap:6px;}
-.bot-message{background-color:#f3f4f6;color:#111827;padding:8px 12px;border-radius:20px;max-width:70%;word-wrap:break-word; display:flex; align-items:center; gap:6px;}
+/* Message bubbles */
+.user-message{background-color:#703737;color:white;padding:8px 12px;border-radius:20px;max-width:70%;word-wrap:break-word; display:flex; align-items:center; gap:8px;}
+.bot-message{background-color:#f3f4f6;color:#111827;padding:8px 12px;border-radius:20px;max-width:70%;word-wrap:break-word; display:flex; align-items:flex-start; gap:8px;}
+.dark .bot-message{background-color:#111827;color:#e6e6e6;}
 
-/* Typing dots */
+/* Bot message wrapper to allow copy button */
+.bot-message-wrapper{ position: relative; display: inline-block; max-width: 100%; }
+.bot-message .message-content { display: block; line-height: 1.4; }
+
+/* copy icon: hidden until hover/focus */
+.copy-btn {
+  position: absolute;
+  right: 6px;
+  top: 6px;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.14s ease, transform 0.14s ease;
+  background: rgba(255,255,255,0.95);
+  border: 1px solid rgba(0,0,0,0.06);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+}
+.dark .copy-btn{ background: rgba(17,24,39,0.9); border: 1px solid rgba(255,255,255,0.06); }
+
+/* show on hover / keyboard focus */
+.bot-message-wrapper:hover .copy-btn,
+.bot-message-wrapper:focus-within .copy-btn {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+/* tooltip */
+.copy-tooltip {
+  position: absolute;
+  top: -32px;
+  right: 6px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: #111827;
+  color: #fff;
+  font-size: 12px;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.12s ease, transform 0.12s ease;
+  pointer-events: none;
+  z-index: 30;
+}
+.copy-tooltip.show { opacity: 1; transform: translateY(0); }
+
+/* typing dots */
 .typing-dots span{display:inline-block;width:6px;height:6px;margin:0 2px;background:currentColor;border-radius:50%;animation:bounce 1s infinite;}
 .typing-dots span:nth-child(2){animation-delay:0.1s;}
 .typing-dots span:nth-child(3){animation-delay:0.2s;}
 @keyframes bounce{0%,80%,100%{transform:scale(0.6);}40%{transform:scale(1);}}
 
-/* Input focus */
-#user_input:focus{border-radius:12px;outline:none;box-shadow:0 0 0 3px rgba(99,102,241,0.5);transition:box-shadow 0.3s ease,border-radius 0.3s ease;}
+/* input focus visual */
+#user_input:focus{border-radius:12px;outline:none;box-shadow:0 0 0 3px rgba(99,102,241,0.14);transition:box-shadow 0.3s ease,border-radius 0.3s ease;}
+
+/* ensure links inside messages look good */
+.bot-message a { color: inherit; text-decoration: underline; }
+.bot-message a:hover { text-decoration: none; }
+
+/* small responsive tweaks */
+@media (min-width:768px){
+  .bot-message-wrapper { max-width: 60%; }
+  .user-message { max-width: 60%; }
+}
 </style>
 </head>
+
 <body class="h-screen flex flex-col bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300">
 <!-- Login warning -->
 {% if not request.session.user_id %}
@@ -38,8 +114,8 @@
   <div class="flex items-center gap-2">
     <span class="text-xl">⚠️</span>
     <span>
-      Please 
-      <a href="{% url 'login' %}" class="underline font-medium hover:text-yellow-700">login</a> or 
+      Please
+      <a href="{% url 'login' %}" class="underline font-medium hover:text-yellow-700">login</a> or
       <a href="{% url 'register' %}" class="underline font-medium hover:text-yellow-700">register</a> to save your chat history.
     </span>
   </div>
@@ -47,146 +123,267 @@
 </div>
 {% endif %}
 
-
-<!-- Django Messages -->
-  {% if messages %}
-  <div class="w-full flex justify-center mt-4">
-      <div class="w-full max-w-md">
-          {% for message in messages %}
-          <div class="px-4 py-3 rounded-lg text-sm mb-2 text-center
-              {% if message.tags == 'error' %}bg-red-100 text-red-700 border border-red-400{% endif %}
-              {% if message.tags == 'success' %}bg-green-100 text-green-700 border border-green-400{% endif %}">
-              {{ message }}
-          </div>
-          {% endfor %}
-      </div>
+<!-- Django messages -->
+{% if messages %}
+<div class="w-full flex justify-center mt-4">
+  <div class="w-full max-w-md">
+    {% for message in messages %}
+    <div class="px-4 py-3 rounded-lg text-sm mb-2 text-center
+        {% if message.tags == 'error' %}bg-red-100 text-red-700 border border-red-400{% endif %}
+        {% if message.tags == 'success' %}bg-green-100 text-green-700 border border-green-400{% endif %}">
+      {{ message }}
+    </div>
+    {% endfor %}
   </div>
-  {% endif %}
+</div>
+{% endif %}
 
 <header class="bg-white dark:bg-gray-800 border-b px-4 py-3 flex items-center justify-between shadow-sm">
-<h1 class="text-lg font-semibold text-gray-800 dark:text-gray-200 flex-1 text-center">GVP University Help Desk AI</h1>
-<div class="flex items-center gap-3">
-{% if request.session.user_id %}
-<a href="{% url 'profile' %}" class="px-3 py-1 rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center">
-<span class="material-symbols-outlined">account_circle</span>
-</a>
-{% else %}
-<a href="{% url 'register' %}" class="px-3 py-1 rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center">
-<span class="material-symbols-outlined">account_circle</span>
-</a>
-{% endif %}
-<button id="themeToggle" class="px-3 py-1 rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-gray-700">
-<span class="material-symbols-outlined">routine</span>
-</button>
-</div>
+  <h1 class="text-lg font-semibold text-gray-800 dark:text-gray-200 flex-1 text-center">GVP University Help Desk AI</h1>
+  <div class="flex items-center gap-3">
+    {% if request.session.user_id %}
+    <a href="{% url 'profile' %}" class="px-3 py-1 rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center">
+      <span class="material-symbols-outlined">account_circle</span>
+    </a>
+    {% else %}
+    <a href="{% url 'register' %}" class="px-3 py-1 rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center">
+      <span class="material-symbols-outlined">account_circle</span>
+    </a>
+    {% endif %}
+    <button id="themeToggle" class="px-3 py-1 rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-gray-700">
+      <span class="material-symbols-outlined">routine</span>
+    </button>
+  </div>
 </header>
 
 <div class="flex flex-1 overflow-hidden">
-<aside class="hidden md:flex flex-col w-64 border-r bg-white dark:bg-gray-900 p-6">
-<div class="flex flex-col items-center mb-6">
-<img src="{% static 'media/gvlogo.png' %}" alt="Logo" class="w-20 h-20 mb-2 rounded-full border border-gray-300 dark:border-gray-700 shadow-sm">
-<h2 class="text-lg font-semibold text-center">Gujarat Vidyapith</h2>
-<p class="text-sm text-gray-500 dark:text-gray-400">Founded by Mahatma Gandhi</p>
-<hr class="w-full my-4 border-gray-300 dark:border-gray-700">
-<a href="{% url 'chatbot_home' %}" id="newChatBtn" class="w-full text-left px-3 py-2 mt-2 rounded-xl border hover:bg-gray-100 dark:hover:bg-gray-700 block">
-    New Chat🧹
-</a>
-<a href="{% url 'chat_history' %}" class="w-full text-left px-3 py-2 mt-2 rounded-xl border hover:bg-gray-100 dark:hover:bg-gray-700 block">
-    Chat History 📜
-</a>
-</aside>
+  <aside class="hidden md:flex flex-col w-64 border-r bg-white dark:bg-gray-900 p-6">
+    <div class="flex flex-col items-center mb-6">
+      <img src="{% static 'media/gvlogo.png' %}" alt="Logo" class="w-20 h-20 mb-2 rounded-full border border-gray-300 dark:border-gray-700 shadow-sm">
+      <h2 class="text-lg font-semibold text-center">Gujarat Vidyapith</h2>
+      <p class="text-sm text-gray-500 dark:text-gray-400">Founded by Mahatma Gandhi</p>
+      <hr class="w-full my-4 border-gray-300 dark:border-gray-700">
+      <a href="{% url 'chatbot_home' %}" id="newChatBtn" class="w-full text-left px-3 py-2 mt-2 rounded-xl border hover:bg-gray-100 dark:hover:bg-gray-700 block">
+        New Chat🧹
+      </a>
+      <a href="{% url 'chat_history' %}" class="w-full text-left px-3 py-2 mt-2 rounded-xl border hover:bg-gray-100 dark:hover:bg-gray-700 block">
+        Chat History 📜
+      </a>
+    </div>
+  </aside>
 
-<main class="flex-1 flex flex-col">
-<div id="chatbox" class="flex-1 overflow-y-auto p-6 space-y-4">
-{% if chat_history %}
-  {% for chat in chat_history %}
-    {% if chat.is_bot %}
-    <div class="flex justify-start">
-      <div class="bot-message">
-        <span class="material-symbols-outlined">smart_toy</span>
-        <span>{{ chat.message }}</span>
+  <main class="flex-1 flex flex-col">
+    <div id="chatbox" class="flex-1 overflow-y-auto p-6 space-y-4">
+      {% if chat_history %}
+        {% for chat in chat_history %}
+          {% if chat.is_bot %}
+          <div class="flex justify-start">
+            <div class="bot-message-wrapper">
+              <div class="bot-message">
+                <span class="material-symbols-outlined">smart_toy</span>
+                <span class="message-content">{% autoescape off %}{{ chat.message|safe }}{% endautoescape %}</span>
+              </div>
+              <!-- server-rendered chat from history gets copy button for consistency -->
+              <button class="copy-btn" aria-label="Copy reply" onclick="copyHistoryText(this)">
+                <span class="material-symbols-outlined" style="font-size:16px;">content_copy</span>
+              </button>
+              <div class="copy-tooltip">Copied!</div>
+            </div>
+          </div>
+          {% else %}
+          <div class="flex justify-end">
+            <div class="user-message">
+              <span>{{ chat.message }}</span>
+              <span class="material-symbols-outlined">person</span>
+            </div>
+          </div>
+          {% endif %}
+        {% endfor %}
+      {% else %}
+      <div class="flex justify-start">
+        <div class="bot-message-wrapper">
+          <div class="bot-message">
+            <span class="material-symbols-outlined">smart_toy</span>
+            <span class="message-content">Hello {{ request.session.username|default:"!" }}! I’m UniBuddy. Ask me anything about the university.</span>
+          </div>
+          <button class="copy-btn" aria-label="Copy reply" onclick="copyHistoryText(this)">
+            <span class="material-symbols-outlined" style="font-size:16px;">content_copy</span>
+          </button>
+          <div class="copy-tooltip">Copied!</div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="border-t bg-white dark:bg-gray-800 p-3">
+      <div class="flex items-center gap-2 border rounded-xl p-1.5 shadow-sm dark:border-gray-700">
+        <textarea id="user_input" rows="1" placeholder="Ask Anything..." class="flex-1 resize-none outline-none px-2 py-1 text-sm bg-transparent"></textarea>
+        <button id="sendBtn" class="bg-[#703737] text-white px-3 py-1.5 rounded-lg text-sm hover:bg-[#582e2e] transition flex items-center justify-center">
+          <span class="material-symbols-outlined text-base">send</span>
+        </button>
       </div>
     </div>
-    {% else %}
-    <div class="flex justify-end">
-      <div class="user-message">
-        <span>{{ chat.message }}</span>
-        <span class="material-symbols-outlined">person</span>
-      </div>
-    </div>
-    {% endif %}
-  {% endfor %}
-{% else %}
-<div class="flex justify-start">
-  <div class="bot-message">
-    <span class="material-symbols-outlined">smart_toy</span>
-    <span>Hello {{ request.session.username|default:"!" }}! I’m UniBuddy. Ask me anything about the university.</span>
-  </div>
-</div>
-{% endif %}
-</div>
-
-<div class="border-t bg-white dark:bg-gray-800 p-3">
-<div class="flex items-center gap-2 border rounded-xl p-1.5 shadow-sm dark:border-gray-700">
-<textarea id="user_input" rows="1" placeholder="Ask Anything..." class="flex-1 resize-none outline-none px-2 py-1 text-sm bg-transparent"></textarea>
-<button id="sendBtn" class="bg-[#703737] text-white px-3 py-1.5 rounded-lg text-sm hover:bg-[#582e2e] transition flex items-center justify-center">
-<span class="material-symbols-outlined text-base">send</span>
-</button>
-</div>
-</div>
-</main>
+  </main>
 </div>
 
 <script>
 // Theme toggle
-function setTheme(theme){document.documentElement.classList.toggle('dark', theme==='dark');localStorage.setItem('theme', theme);}
+function setTheme(theme){ document.documentElement.classList.toggle('dark', theme==='dark'); localStorage.setItem('theme', theme); }
 function initializeTheme(){
-    const savedTheme = localStorage.getItem('theme');
-    if(savedTheme) setTheme(savedTheme);
-    else setTheme(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark':'light');
+  const saved = localStorage.getItem('theme');
+  if(saved) setTheme(saved);
+  else setTheme(window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
 }
 initializeTheme();
 document.getElementById("themeToggle").addEventListener("click", ()=>{
-    const current = document.documentElement.classList.contains("dark")?"dark":"light";
-    setTheme(current==="dark"?"light":"dark");
+  const current = document.documentElement.classList.contains("dark") ? "dark" : "light";
+  setTheme(current === "dark" ? "light" : "dark");
 });
-window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',(e)=>{
-    const savedTheme = localStorage.getItem('theme');
-    if(!savedTheme) setTheme(e.matches?'dark':'light');
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+  const saved = localStorage.getItem('theme');
+  if(!saved) setTheme(e.matches ? 'dark' : 'light');
 });
 
-// Chat functions
+// Utilities: safe markdown -> sanitized HTML
+function renderMarkdownToSafeHtml(mdText){
+  // marked -> HTML
+  const rawHtml = marked.parse(mdText || '');
+  // DOMPurify sanitize and allow links to have target and rel
+  return DOMPurify.sanitize(rawHtml, {
+    ADD_ATTR: ['target', 'rel'],
+    FORBID_TAGS: ['script', 'style'],
+    RETURN_TRUSTED_TYPE: false
+  });
+}
+
+// copy behavior for history server-rendered messages
+function copyHistoryText(btn){
+  const wrapper = btn.closest('.bot-message-wrapper');
+  const content = wrapper.querySelector('.message-content');
+  const text = content ? content.innerText : '';
+  navigator.clipboard.writeText(text).then(() => {
+    const tip = wrapper.querySelector('.copy-tooltip');
+    tip.classList.add('show');
+    setTimeout(()=> tip.classList.remove('show'), 1200);
+  }).catch(()=> alert('Copy failed'));
+}
+
+// Chat DOM helpers
 function addUserMessage(text){
-  $("#chatbox").append(`<div class="flex justify-end"><div class="user-message"><span>${text}</span><span class="material-symbols-outlined">person</span></div></div>`);
-  $("#chatbox").scrollTop($("#chatbox")[0].scrollHeight);
+  const chatbox = $("#chatbox");
+  chatbox.append(`<div class="flex justify-end"><div class="user-message"><span>${escapeHtml(text)}</span><span class="material-symbols-outlined">person</span></div></div>`);
+  chatbox.scrollTop(chatbox[0].scrollHeight);
 }
-function addBotMessage(text){
-  $("#chatbox").append(`<div class="flex justify-start"><div class="bot-message"><span class="material-symbols-outlined">smart_toy</span><span>${text}</span></div></div>`);
-  $("#chatbox").scrollTop($("#chatbox")[0].scrollHeight);
-}
+
 function showTypingIndicator(){
   $("#chatbox").append(`<div id="typing" class="flex justify-start"><div class="bot-message typing-dots"><span></span><span></span><span></span></div></div>`);
   $("#chatbox").scrollTop($("#chatbox")[0].scrollHeight);
 }
 function removeTypingIndicator(){ $("#typing").remove(); }
 
-function sendMessage(){
-    var userText = $("#user_input").val();
-    if(!userText.trim()) return;
-    addUserMessage(userText);
-    $("#user_input").val("");
-    showTypingIndicator();
-    $.get("/get/", { msg: userText }).done(function(data){
-        setTimeout(()=>{removeTypingIndicator();addBotMessage(data.reply);},1500);
-    });
+// NEW: addBotMessage accepts Markdown string, renders safely, adds copy button
+function addBotMessage(markdownText){
+  const safeHtml = renderMarkdownToSafeHtml(markdownText);
+
+  const wrapper = document.createElement('div');
+  wrapper.className = 'flex justify-start';
+
+  const innerWrapper = document.createElement('div');
+  innerWrapper.className = 'bot-message-wrapper';
+
+  const messageEl = document.createElement('div');
+  messageEl.className = 'bot-message';
+  messageEl.innerHTML = `<span class="material-symbols-outlined">smart_toy</span><span class="message-content">${safeHtml}</span>`;
+
+  const copyBtn = document.createElement('button');
+  copyBtn.className = 'copy-btn';
+  copyBtn.setAttribute('aria-label','Copy reply');
+  copyBtn.innerHTML = `<span class="material-symbols-outlined" style="font-size:16px;">content_copy</span>`;
+
+  const tooltip = document.createElement('div');
+  tooltip.className = 'copy-tooltip';
+  tooltip.textContent = 'Copied!';
+
+  // copy plain text of rendered content
+  copyBtn.addEventListener('click', async function(e){
+    e.stopPropagation();
+    const contentNode = messageEl.querySelector('.message-content');
+    const textToCopy = contentNode ? contentNode.innerText : markdownText;
+    try {
+      await navigator.clipboard.writeText(textToCopy);
+      tooltip.classList.add('show');
+      setTimeout(()=> tooltip.classList.remove('show'), 1200);
+    } catch(err) {
+      // fallback
+      const ta = document.createElement('textarea');
+      ta.value = textToCopy;
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); tooltip.classList.add('show'); setTimeout(()=> tooltip.classList.remove('show'), 1200); } catch(e){ alert('Copy failed'); }
+      ta.remove();
+    }
+  });
+
+  copyBtn.addEventListener('keydown', function(e){
+    if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); copyBtn.click(); }
+  });
+
+  innerWrapper.appendChild(messageEl);
+  innerWrapper.appendChild(copyBtn);
+  innerWrapper.appendChild(tooltip);
+  wrapper.appendChild(innerWrapper);
+
+  document.getElementById('chatbox').appendChild(wrapper);
+  document.getElementById('chatbox').scrollTop = document.getElementById('chatbox').scrollHeight;
 }
-$("#user_input").keypress(function(e){if(e.which===13 && !e.shiftKey){sendMessage();return false;}});
+
+// small safe escaper for user message display
+function escapeHtml(unsafe){
+  return String(unsafe)
+    .replaceAll('&','&amp;')
+    .replaceAll('<','&lt;')
+    .replaceAll('>','&gt;')
+    .replaceAll('"','&quot;')
+    .replaceAll("'",'&#039;');
+}
+
+// AJAX send
+function sendMessage(){
+  const userText = $("#user_input").val();
+  if(!userText || !userText.trim()) return;
+  addUserMessage(userText);
+  $("#user_input").val("");
+  showTypingIndicator();
+
+  $.get("/get/", { msg: userText }).done(function(data){
+    // expect plain markdown text in data.reply
+    // remove typing indicator, then render
+    setTimeout(()=>{
+      removeTypingIndicator();
+      // defend if server returned HTML accidentally: always treat as markdown
+      const replyMarkdown = (typeof data.reply === 'string') ? data.reply : JSON.stringify(data.reply);
+      addBotMessage(replyMarkdown);
+    }, 700);
+  }).fail(function(){
+    removeTypingIndicator();
+    addBotMessage("Sorry, I could not reach the server. Try again in a moment.");
+  });
+}
+
+// bindings
+$("#user_input").keypress(function(e){ if(e.which === 13 && !e.shiftKey){ sendMessage(); return false; } });
 $("#sendBtn").click(sendMessage);
 
-// Clear chat DOM only on New Chat
+// keep Enter to send; Shift+Enter for newline
+$("#user_input").on('input', function(){
+  this.style.height = 'auto';
+  this.style.height = (this.scrollHeight) + 'px';
+});
+
+// New chat button resets DOM only
 $("#newChatBtn").click(function(){
-    $("#chatbox").html(`<div class="flex justify-start"><div class="bot-message"><span class="material-symbols-outlined">smart_toy</span><span>Hello! I’m UniBuddy. Ask me anything about the university.</span></div></div>`);
-    $("#user_input").val("");
+  $("#chatbox").html(`<div class="flex justify-start"><div class="bot-message-wrapper"><div class="bot-message"><span class="material-symbols-outlined">smart_toy</span><span class="message-content">Hello! I’m UniBuddy. Ask me anything about the university.</span></div><button class="copy-btn" aria-label="Copy reply" onclick="copyHistoryText(this)"><span class="material-symbols-outlined" style="font-size:16px;">content_copy</span></button><div class="copy-tooltip">Copied!</div></div></div>`);
+  $("#user_input").val("");
 });
 </script>
 </body>
