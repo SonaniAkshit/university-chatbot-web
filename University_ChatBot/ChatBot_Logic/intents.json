@@ -1,601 +1,236 @@
 {
-  "generated_on": "2025-11-19",
-  "meta": {
-    "notes": "This dataset is a large training-friendly intents JSON for a Gujarat Vidyapith chatbot. Many department intents are included (40+ departments). Where precise, time-sensitive numbers (seat counts, fees, intake) are required, the response points to the admission prospectus or department pages.",
-    "key_facts_cited": [
-      {
-        "fact": "Gujarat Vidyapith founded by Mahatma Gandhi on 18 October 1920",
-        "cite": "https://gujaratvidyapith.org"
-      },
-      {
-        "fact": "Official admission prospectus / guidelines (2025) available as PDF",
-        "cite": "https://gujaratvidyapith.org/admission/"
-      },
-      {
-        "fact": "Ph.D. admission guide and categories for 2025–26 available as PDF",
-        "cite": "https://gujaratvidyapith.org/admission/"
-      },
-      {
-        "fact": "The Academics/Departments listing and syllabus pages show departmental offerings and course structure",
-        "cite": "https://gujaratvidyapith.org/academics/"
-      },
-      {
-        "fact": "Department pages (Education, Microbiology, Management, History, Journalism, etc.) list program-level details",
-        "cite": "https://gujaratvidyapith.org/departments/"
-      }
+    "intents": [
+        {
+            "tag": "greeting",
+            "patterns": [
+                "hi",
+                "hello",
+                "hey",
+                "hey there",
+                "good morning",
+                "good afternoon",
+                "good evening",
+                "namaste",
+                "hi bot",
+                "hello chatbot",
+                "is anyone there",
+                "yo",
+                "hi",
+                "hello",
+                "hey",
+                "hey there",
+                "good morning",
+                "good afternoon",
+                "good evening",
+                "namaste",
+                "hi bot",
+                "hello chatbot",
+                "is anyone there",
+                "yo"
+            ],
+            "responses": [
+                "Hello! How can I help you with Gujarat Vidyapith information?",
+                "Hi, tell me what you want to know about Gujarat Vidyapith.",
+                "Namaste! You can ask me about admissions, courses, departments or campus facilities.",
+                "Hello! How can I help you with Gujarat Vidyapith information?",
+                "Hi, tell me what you want to know about Gujarat Vidyapith.",
+                "Namaste! You can ask me about admissions, courses, departments or campus facilities."
+            ]
+        },
+        {
+            "tag": "goodbye",
+            "patterns": [
+                "bye",
+                "ok bye",
+                "goodbye",
+                "see you",
+                "talk to you later",
+                "thank you bye",
+                "okay thanks bye"
+            ],
+            "responses": [
+                "Thank you for chatting. All the best!",
+                "Goodbye! Feel free to come back if you have more questions.",
+                "See you! I’m here whenever you need Gujarat Vidyapith info."
+            ]
+        },
+        {
+            "tag": "thanks",
+            "patterns": [
+                "thanks",
+                "thank you",
+                "thank you so much",
+                "thanks a lot",
+                "ok thanks",
+                "great thanks",
+                "nice thanks"
+            ],
+            "responses": [
+                "You’re welcome! Do you want to know anything else?",
+                "Glad I could help. Anything more about Gujarat Vidyapith?",
+                "Any time! You can ask more questions if you like."
+            ]
+        },
+        {
+            "tag": "general_info",
+            "patterns": [
+                "tell me about gujarat vidyapith",
+                "what is gujarat vidyapith",
+                "about gujarat vidyapith",
+                "gujarat vidyapith details",
+                "when was gujarat vidyapith founded",
+                "who founded gujarat vidyapith",
+                "gvp university information",
+                "gujarat vidyapith profile"
+            ],
+            "responses": [
+                "Gujarat Vidyapith is a deemed university founded by Mahatma Gandhi on 18 October 1920. It follows Gandhian values and offers programs from UG to PhD in humanities, social sciences, education, science and rural management. For official details, visit the university website: https://gujaratvidyapith.org",
+                "Gujarat Vidyapith, started by Mahatma Gandhi in 1920, is a Gandhian university with many UG, PG and PhD programs. You can see the full profile on the official site."
+            ]
+        },
+        {
+            "tag": "admission_info",
+            "patterns": [
+                "how can i apply for admission",
+                "what is the admission process",
+                "how to get admission",
+                "admission procedure",
+                "ug admission process",
+                "pg admission process",
+                "admission 2025 details",
+                "how to apply online",
+                "gvp admission info"
+            ],
+            "responses": [
+                "Admissions are done through the official admission portal and prospectus. Common steps: check eligibility in the prospectus, fill the online form, appear for entrance/merit process if required, then complete document verification and fee payment. For latest rules and dates, see the admission page: https://gujaratvidyapith.org/admission/",
+                "To get admission, first check the latest admission brochure, then apply online as per the schedule, and follow the entrance/merit and document verification process mentioned there."
+            ]
+        },
+        {
+            "tag": "fees_overview",
+            "patterns": [
+                "what are the fees",
+                "fee structure",
+                "course fees",
+                "fees for ug courses",
+                "fees for pg courses",
+                "how much does bca cost",
+                "how much is msc fee",
+                "gvp fees details"
+            ],
+            "responses": [
+                "Fees depend on the program and year. Arts and social science courses are usually lower cost, while professional and vocational courses may be higher. For exact fee structure, always refer to the latest admission prospectus or fee circular on the admission page: https://gujaratvidyapith.org/admission/",
+                "The exact fee for each course is given in the current admission brochure. Please check the official admission PDF for updated fees."
+            ]
+        },
+        {
+            "tag": "documents_required",
+            "patterns": [
+                "which documents are required for admission",
+                "documents needed for admission",
+                "list of documents for application",
+                "what documents do i need for gujarat vidyapith admission",
+                "documents for ug admission",
+                "documents for pg admission"
+            ],
+            "responses": [
+                "Common documents include: 10th and 12th mark sheets, graduation mark sheets (for PG), transfer/college leaving certificate, ID proof, passport-size photos, caste/ reservation certificate if applicable, and entrance score card if required. Always cross-check with the latest admission prospectus for your specific program.",
+                "You will normally need your previous exam mark sheets, ID proof, photos, transfer certificate and category certificates (if applicable). Confirm the exact list in the official admission brochure."
+            ]
+        },
+        {
+            "tag": "contact",
+            "patterns": [
+                "how can i contact the university",
+                "university phone number",
+                "admission email",
+                "gujarat vidyapith contact details",
+                "gvp address",
+                "university address and phone"
+            ],
+            "responses": [
+                "Official contact numbers, email IDs and campus address are available on the contact page of Gujarat Vidyapith. Please refer to the latest details here: https://gujaratvidyapith.org/contact/",
+                "For correct phone numbers and email addresses, check the Contact/Admission section on the official website. That page is kept updated."
+            ]
+        },
+        {
+            "tag": "campus_life",
+            "patterns": [
+                "tell me about campus life",
+                "how is the campus life",
+                "hostel facilities",
+                "sports and activities",
+                "what facilities are available on campus",
+                "campus facilities gujarat vidyapith"
+            ],
+            "responses": [
+                "The campus follows Gandhian values with community living, hostels, central library, sports facilities and various extension activities. Hostel and facility details, along with rules and fees, are usually given in the admission brochure and on the website.",
+                "Gujarat Vidyapith offers hostels, library, sports and cultural activities in line with Gandhian philosophy. For detailed facilities and rules, check the university website or prospectus."
+            ]
+        },
+        {
+            "tag": "department_Computer_Science",
+            "patterns": [
+                "tell me about bca course",
+                "bca in gujarat vidyapith",
+                "computer science department details",
+                "cs department gvp",
+                "mca program at gujarat vidyapith",
+                "computer science syllabus",
+                "bca syllabus",
+                "mca syllabus",
+                "computer applications course"
+            ],
+            "responses": [
+                "The Department of Computer Science offers BCA and related computer application programs. Syllabus and semester-wise course structure are available on the syllabus and department pages of the official website. For detailed eligibility, intake and fees, refer to the admission brochure.",
+                "For BCA/MCA and other computer courses at Gujarat Vidyapith, please see the Computer Science department and syllabus pages on the official site: https://gujaratvidyapith.org/departments/"
+            ]
+        },
+        {
+            "tag": "library_info",
+            "patterns": [
+                "tell me about the library",
+                "central library details",
+                "library gujarat vidyapith",
+                "library services",
+                "library timing",
+                "how is the library"
+            ],
+            "responses": [
+                "Gujarat Vidyapith has a central library (Granthalay) that supports all major disciplines. For information about collection size, services and timings, please check the library section on the official website or contact the library directly: https://gujaratvidyapith.org/library/",
+                "The central library provides books, journals and reference material for students and researchers. Exact rules and timings are given on the library page."
+            ]
+        },
+        {
+            "tag": "hostel_info",
+            "patterns": [
+                "is hostel available",
+                "hostel information",
+                "hostel fees",
+                "how to get hostel",
+                "girls hostel",
+                "boys hostel"
+            ],
+            "responses": [
+                "Yes, hostels are available for eligible students. Hostel allotment, rules and fees are given in the admission prospectus and hostel guidelines. Please see the latest admission brochure or contact the hostel office for accurate details.",
+                "Hostel facilities exist for both boys and girls. For seat availability, rules and fee structure, always check the current prospectus or official notice."
+            ]
+        },
+        {
+            "tag": "not_found",
+            "patterns": [
+                "",
+                "I don't understand",
+                "you are wrong",
+                "this is not correct",
+                "you did not answer",
+                "what are you saying"
+            ],
+            "responses": [
+                "I’m not sure I understood that correctly. Can you please ask in a simpler way or specify the course/department/admission detail you want?",
+                "I don’t have an exact answer for that. Try asking about a specific program, department, fees, admission process or contact detail.",
+                "Sorry, I couldn’t find a clear answer. Please rephrase your question or ask about Gujarat Vidyapith courses, admissions, fees, hostels or campus."
+            ]
+        }
     ]
-  },
-
-  "intents": [
-    {
-      "tag": "greeting",
-      "patterns": [
-        "Hi",
-        "Hello",
-        "Hey there",
-        "Greetings",
-        "What's up",
-        "Good morning",
-        "Good afternoon",
-        "Good evening",
-        "Namaste"
-      ],
-      "responses": [
-        "Hello! How can I help you with information about Gujarat Vidyapith?",
-        "Hi — ask me about admissions, courses, departments, hostels, library, or the Vidyapith profile."
-      ]
-    },
-
-    {
-      "tag": "general_info",
-      "patterns": [
-        "Tell me about Gujarat Vidyapith",
-        "What is Gujarat Vidyapith",
-        "When was Gujarat Vidyapith founded",
-        "Who founded Gujarat Vidyapith",
-        "Give me the university profile"
-      ],
-      "responses": [
-        "Gujarat Vidyapith was founded by Mahatma Gandhi on 18 October 1920. It is a deemed university (since 1963) with an emphasis on Gandhian values, offering programs from undergraduate to Ph.D. across humanities, social sciences, education, science, rural management and professional courses. For official detail, see the university site or admission prospectus. https://gujaratvidyapith.org"
-      ]
-    },
-
-    {
-      "tag": "admission_info",
-      "patterns": [
-        "How can I apply",
-        "What is the admission process",
-        "How to get admission",
-        "Tell me about applications",
-        "Admission process 2025"
-      ],
-      "responses": [
-        "Admissions are handled via the official admission portal and printed prospectus. Typical steps: download prospectus, check eligibility, apply online, appear for entrance/merit selection (program dependent), complete document verification and fee payment. See the 2025 admission PDF for exact steps and deadlines. https://gujaratvidyapith.org/admission/"
-      ]
-    },
-
-    {
-      "tag": "admission_documents",
-      "patterns": [
-        "What documents are required for admission",
-        "List of documents for applying",
-        "Documents needed for Gujarat Vidyapith application"
-      ],
-      "responses": [
-        "Commonly required documents: 10th/12th marksheets, degree/transfer certificate (for PG), ID proof, passport-size photos, caste certificate if applicable, and entrance test scorecard (if required). Check the prospectus for program-specific lists. https://gujaratvidyapith.org/admission/"
-      ]
-    },
-
-    {
-      "tag": "admission_exams",
-      "patterns": [
-        "What entrance exams are accepted",
-        "Tell me about GEETA",
-        "Does the university accept CUET",
-        "Entrance test information"
-      ],
-      "responses": [
-        "Gujarat Vidyapith uses its admission guidelines (and in 2025 conducted entrance rounds; GEETA is used for several programs). Certain PG/UG seats may accept national exam scores like CUET depending on the program. For Ph.D. there are specific NET / JRF categories and entrance/interview rules as in the Ph.D. prospectus. https://gujaratvidyapith.org/admission/"
-      ]
-    },
-
-    {
-      "tag": "courses_overview",
-      "patterns": [
-        "What courses are offered",
-        "List courses",
-        "UG and PG programs",
-        "What degrees are available"
-      ],
-      "responses": [
-        "Gujarat Vidyapith offers UG (BA, BSc, BCom, BCA, BRS, BPES), PG (MA, MSc, MEd, MSW, MBA Rural Management, MLISc, MCA), diplomas, M.Phil and Ph.D. across departments such as Languages, Social Sciences, Education, Science, Library Science, Computer Applications and Rural Management. See departmental pages for syllabi. https://gujaratvidyapith.org/departments/"
-      ]
-    },
-
-    {
-      "tag": "fees_overview",
-      "patterns": [
-        "What are the fees",
-        "How much does a course cost",
-        "Fee structure",
-        "Fees for UG courses",
-        "Fees for PG programs"
-      ],
-      "responses": [
-        "Fees vary by program and year. Arts and social sciences programs are generally lower-cost; professional and vocational courses cost more. Use the admission prospectus for exact program-wise fee matrices for the academic year. https://gujaratvidyapith.org/admission/"
-      ]
-    },
-
-    {
-      "tag": "phd_info",
-      "patterns": [
-        "Tell me about PhD admission",
-        "How do I apply for PhD",
-        "PhD eligibility",
-        "PhD fees and duration"
-      ],
-      "responses": [
-        "Ph.D. admissions follow the Ph.D. prospectus rules (2025 guide). Categories include NET-JRF, NET-qualified for Assistant Professor, and NET-only categories with merit/interview weightage. Minimum duration is typically 3 years; eligibility usually requires a Master's degree. See the official Ph.D. prospectus for category-specific rules and seat allocation. https://gujaratvidyapith.org/admission/"
-      ]
-    },
-
-    {
-      "tag": "contact",
-      "patterns": [
-        "How can I contact the university",
-        "University phone number",
-        "Admission email",
-        "Gujarat Vidyapith address"
-      ],
-      "responses": [
-        "For contact details, use the official site contact page. The main Ahmedabad campus address and phone numbers are published on the site; see the Contact / Admission page for up-to-date phone and email addresses. https://gujaratvidyapith.org/contact/"
-      ]
-    },
-
-    {
-      "tag": "campus_life",
-      "patterns": [
-        "What is campus life like",
-        "Tell me about hostels",
-        "What facilities are available",
-        "Campus facilities"
-      ],
-      "responses": [
-        "The campus supports Gandhian community living with hostels, a central library, sports facilities, auditoria and extension programs. Hostels are available for men and women; allocation and fees are in the admission brochure. https://gujaratvidyapith.org"
-      ]
-    },
-
-    {
-      "tag": "library_info",
-      "patterns": [
-        "Tell me about the library",
-        "How big is the central library",
-        "Library services",
-        "Library timings"
-      ],
-      "responses": [
-        "Gujarat Vidyapith's central library (Granthalay) supports humanities, social sciences and science programs with an extensive collection. For holdings, membership, services and timings check the library page or contact the library office. https://gujaratvidyapith.org/library/"
-      ]
-    },
-
-    {
-      "tag": "hostel_info",
-      "patterns": [
-        "Does the university have a hostel",
-        "Hostel fees",
-        "How to apply for hostel",
-        "Hostel facilities"
-      ],
-      "responses": [
-        "Yes — hostels exist for students. Application, eligibility, seat allotment, and fees are governed by hostel office circulars and included in the admission prospectus for each academic year. Check the prospectus for specific rules and fee amounts. https://gujaratvidyapith.org/admission/"
-      ]
-    },
-
-    {
-      "tag": "syllabus_and_courses",
-      "patterns": [
-        "Where can I find syllabus",
-        "Course structure BCA",
-        "MSc Microbiology syllabus",
-        "BEd syllabus"
-      ],
-      "responses": [
-        "Syllabi for each program are published on the syllabus page and department pages. You can download semester-wise course structures (BCA, MCA, M.Sc, M.A, etc.) from the syllabus/department pages on the official site. https://gujaratvidyapith.org/syllabus/"
-      ]
-    },
-
-    {
-      "tag": "vocational_programs",
-      "patterns": [
-        "Tell me about vocational courses",
-        "What is VIKAS",
-        "Skill courses at Vidyapith"
-      ],
-      "responses": [
-        "The VIKAS unit (Vishwakarma Institute of Kaushal and Swavlamban) runs vocational and skill programs (electronics, solar PV, dress designing, etc.) and NEP-aligned short courses. Check the VIKAS page for current program lists. https://gujaratvidyapith.org/vikas/"
-      ]
-    },
-
-    {
-      "tag": "departments_list",
-      "patterns": [
-        "List all departments",
-        "What departments are there",
-        "Department names Gujarat Vidyapith"
-      ],
-      "responses": [
-        "Gujarat Vidyapith's departments include Languages & Literature (Gujarati, Hindi, English), Social Sciences (History, Economics, Sociology), Education, Physical Education, Science (Microbiology, Physics, Chemistry), Computer Science, Journalism & Mass Communication, Library & Information Science, Rural Management, and more. See the Academics/Departments page for a full list. https://gujaratvidyapith.org/departments/"
-      ]
-    },
-
-    {
-      "tag": "department_Gujarati",
-      "patterns": [
-        "Tell me about Department of Gujarati",
-        "Gujarati department courses",
-        "Gujarati department research",
-        "What programs does Gujarati department offer",
-        "Gujarati department contact"
-      ],
-      "responses": [
-        "Department of Gujarati offers BA, MA, M.Phil and Ph.D. programs, with coursework and research in Gujarati literature, linguistics and cultural studies. For faculty details and course syllabi, view the department page on the university website. https://gujaratvidyapith.org/departments/"
-      ]
-    },
-
-    {
-      "tag": "department_Hindi",
-      "patterns": [
-        "Tell me about Department of Hindi",
-        "Hindi department courses",
-        "Hindi MA program",
-        "Hindi department research"
-      ],
-      "responses": [
-        "Department of Hindi offers BA, MA, Ph.D. and PG diplomas in applied translation and linguistics. Research and teacher-training activities are active; check the department page for syllabi and faculty. https://gujaratvidyapith.org/departments/"
-      ]
-    },
-
-    {
-      "tag": "department_English",
-      "patterns": [
-        "Tell me about Department of English",
-        "English department courses",
-        "MA English syllabus",
-        "English literature department"
-      ],
-      "responses": [
-        "Department of English provides BA/MA programs and research degrees; it focuses on literature, language studies and pedagogy. Department syllabi and course structure are on the syllabus page. https://gujaratvidyapith.org/departments/"
-      ]
-    },
-
-    {
-      "tag": "department_History",
-      "patterns": [
-        "Tell me about Department of History",
-        "History department courses",
-        "MPhil in History",
-        "History research areas"
-      ],
-      "responses": [
-        "Department of History and Culture offers BA, MA, M.Phil and Ph.D. with strengths in archaeology, history of Gujarat, archival science and history of the freedom movement. Research intake and supervisor availability determine Ph.D. seats; see the department page. https://gujaratvidyapith.org/departments/"
-      ]
-    },
-
-    {
-      "tag": "department_Economics",
-      "patterns": [
-        "Tell me about Department of Economics",
-        "Economics BA course",
-        "How to join BA Economics",
-        "Economics department research"
-      ],
-      "responses": [
-        "The Department of Economics runs BA and MA courses, with coursework in microeconomics, macroeconomics and development studies. Consult the department syllabus page for semester-wise subjects. https://gujaratvidyapith.org/departments/"
-      ]
-    },
-
-    {
-      "tag": "department_Sociology",
-      "patterns": [
-        "Tell me about Department of Sociology",
-        "Sociology MA course",
-        "Sociology research areas",
-        "How to apply to Sociology"
-      ],
-      "responses": [
-        "Department of Sociology offers BA and MA programs and supervises M.Phil/Ph.D. research in sociological studies, rural sociology and community development. Admission is as per the prospectus. https://gujaratvidyapith.org/departments/"
-      ]
-    },
-
-    {
-      "tag": "department_Education",
-      "patterns": [
-        "Tell me about Department of Education",
-        "BEd course Gujarat Vidyapith",
-        "MEd course details",
-        "Teacher training at Vidyapith"
-      ],
-      "responses": [
-        "The Faculty of Education provides B.Ed and M.Ed programs and supports M.Phil/Ph.D. research. The teacher-training institute (IASE/Shikshan Mahavidyalay) has historical NCTE recognitions. For exact intake and regulations refer to the department and NCTE / prospectus pages. https://gujaratvidyapith.org/departments/"
-      ]
-    },
-
-    {
-      "tag": "department_Physical_Education",
-      "patterns": [
-        "Tell me about Physical Education department",
-        "BPES course",
-        "MPEd details",
-        "Sports facilities and courses"
-      ],
-      "responses": [
-        "Physical Education offers professional programs such as BPES/B.P.Ed and M.P.Ed, and the campus maintains sports facilities for practical training. Check the syllabus and department pages for program structure. https://gujaratvidyapith.org/departments/"
-      ]
-    },
-
-    {
-      "tag": "department_Computer_Science",
-      "patterns": [
-        "Tell me about Department of Computer Science",
-        "BCA syllabus",
-        "MCA program at Vidyapith",
-        "Computer science courses"
-      ],
-      "responses": [
-        "Department of Computer Science offers BCA and related vocational/PG programs (MCA/PGDCA where offered). Syllabi and semester structures are available on the syllabus page. Professional program intake and eligibility are listed in the prospectus. https://gujaratvidyapith.org/departments/"
-      ]
-    },
-
-    {
-      "tag": "department_Journalism",
-      "patterns": [
-        "Tell me about Department of Journalism",
-        "MA Journalism course",
-        "PGDJMC diploma",
-        "Mass communication program Vidyapith"
-      ],
-      "responses": [
-        "The Department of Journalism & Mass Communication offers MA (Journalism & Mass Communication) and PGDJMC (Postgraduate Diploma) with practical and theoretical coursework. See the department page for program duration and modules. https://gujaratvidyapith.org/departments/"
-      ]
-    },
-
-    {
-      "tag": "department_Library_Science",
-      "patterns": [
-        "Tell me about Department of Library and Information Science",
-        "MLISc course",
-        "BLISc details",
-        "Library science PhD"
-      ],
-      "responses": [
-        "The Department of Library & Information Science runs BLISc, MLISc, M.Phil and Ph.D. It has a long history of teaching library science and supporting research in information studies; check the department page for admission rules. https://gujaratvidyapith.org/departments/"
-      ]
-    },
-
-    {
-      "tag": "department_Microbiology",
-      "patterns": [
-        "Tell me about Department of Microbiology",
-        "MSc Microbiology",
-        "BSc Microbiology",
-        "Microbiology labs and courses"
-      ],
-      "responses": [
-        "The Department of Microbiology offers B.Sc. and M.Sc. programs with laboratory work and certificate courses (biogas, soil analysis, water analysis). See the department page for faculty and course details. https://gujaratvidyapith.org/departments/"
-      ]
-    },
-
-    {
-      "tag": "department_Chemistry",
-      "patterns": [
-        "Tell me about Department of Chemistry",
-        "BSc Chemistry course",
-        "MSc Chemistry syllabus",
-        "Chemistry labs Vidyapith"
-      ],
-      "responses": [
-        "The Department of Chemistry provides B.Sc and M.Sc level teaching with practical lab components and certificate-level short courses. Details are on the syllabus/department pages. https://gujaratvidyapith.org/departments/"
-      ]
-    },
-
-    {
-      "tag": "department_Physics",
-      "patterns": [
-        "Tell me about Department of Physics",
-        "BSc Physics syllabus",
-        "Physics research Vidyapith"
-      ],
-      "responses": [
-        "The Department of Physics handles B.Sc. Physics and related PG-level coursework. For lab infrastructure and syllabus download the department or syllabus pages. https://gujaratvidyapith.org/departments/"
-      ]
-    },
-
-    {
-      "tag": "department_Food_Nutrition",
-      "patterns": [
-        "Tell me about Food and Nutrition department",
-        "MSc Food and Nutrition",
-        "BSc Food Science course"
-      ],
-      "responses": [
-        "The Department of Food & Nutrition offers B.Sc and M.Sc programs with applied courses in food science and nutrition. Program specifics and practical labs are described on the syllabus page. https://gujaratvidyapith.org/departments/"
-      ]
-    },
-
-    {
-      "tag": "department_Rural_Management",
-      "patterns": [
-        "Tell me about Department of Rural Management",
-        "MBA Rural Management",
-        "MA HRM",
-        "Rural management admissions"
-      ],
-      "responses": [
-        "The Department of Rural Management offers MBA (Rural Management) and MA-HRM, focusing on rural development, community enterprises and management for non-urban contexts. Admissions criteria and course modules are on the department page. https://gujaratvidyapith.org/departments/"
-      ]
-    },
-
-    {
-      "tag": "department_Social_Work",
-      "patterns": [
-        "Tell me about Department of Social Work",
-        "MSW program",
-        "Social work admissions"
-      ],
-      "responses": [
-        "Department of Social Work offers MSW and related programs in social welfare, community development and fieldwork. See the syllabus and department pages for practice components and field placement policies. https://gujaratvidyapith.org/departments/"
-      ]
-    },
-
-    {
-      "tag": "department_Management_HRM",
-      "patterns": [
-        "Tell me about Management department",
-        "HRM course details",
-        "MA HRM at Vidyapith"
-      ],
-      "responses": [
-        "The Management/Rural Management area provides MBA (Rural Management) and MA-HRM with coursework tailored to rural and community-oriented management functions. Check the department page for module lists and admission intake. https://gujaratvidyapith.org/departments/"
-      ]
-    },
-
-    {
-      "tag": "department_Jain_Studies",
-      "patterns": [
-        "Tell me about Department of Jain Studies",
-        "Jain studies courses",
-        "Religious studies Vidyapith"
-      ],
-      "responses": [
-        "Interdisciplinary departments and study centers offer area-specific programs; for e.g., religious and cultural studies units may provide MA/PhD level supervision. Check Academics/Departments for exact offerings. https://gujaratvidyapith.org/departments/"
-      ]
-    },
-
-    {
-      "tag": "department_Archival_Science",
-      "patterns": [
-        "Tell me about Archival Science",
-        "MPhil Archival Science",
-        "Archival training Vidyapith"
-      ],
-      "responses": [
-        "The University has archival studies as part of History/Archives programs, including an M.Phil in Archival Science and training for in-service archival staff. See the History & Culture department page for details. https://gujaratvidyapith.org/departments/"
-      ]
-    },
-
-    {
-      "tag": "department_Gandhian_Studies",
-      "patterns": [
-        "Tell me about Gandhian Studies",
-        "Gandhi darshan courses",
-        "Gandhian thought programs"
-      ],
-      "responses": [
-        "Gujarat Vidyapith runs courses and research in Gandhian thought, community programs and outreach; seminars and certificate courses are often scheduled through the Gandhian Studies units. Departmental events and course listings are on the official site. https://gujaratvidyapith.org"
-      ]
-    },
-
-    {
-      "tag": "department_Journalism_and_Mass_Communication",
-      "patterns": [
-        "What does the Journalism department offer",
-        "PGDJMC at Vidyapith",
-        "MA JMC details"
-      ],
-      "responses": [
-        "The Department offers MA in Journalism & Mass Communication and a PG diploma (PGDJMC) with practical modules in reporting, editing and media studies. Check department pages for module lists and internships. https://gujaratvidyapith.org/departments/"
-      ]
-    },
-
-    {
-      "tag": "department_Vikas_Vocational",
-      "patterns": [
-        "Tell me about VIKAS",
-        "Vikas vocational courses",
-        "Skill courses at Vikas Vidyapith"
-      ],
-      "responses": [
-        "VIKAS (Vishwakarma Institute of Kaushal and Swavlamban) runs vocational, skill and project-based training to support employability and self-employment in trades such as electronics, solar PV, tailoring and allied skills. See the VIKAS page. https://gujaratvidyapith.org/vikas/"
-      ]
-    },
-
-    {
-      "tag": "department_Research_and_PhD",
-      "patterns": [
-        "How many PhD seats",
-        "PhD supervisors availability",
-        "Research areas at Vidyapith"
-      ],
-      "responses": [
-        "Ph.D. seats are governed by the Ph.D. rules and depend on available supervisors and sanctioned research seats per department. The Ph.D. prospectus explains categories, eligibility and intake. https://gujaratvidyapith.org/admission/"
-      ]
-    },
-
-    {
-      "tag": "department_Lifelong_Learning",
-      "patterns": [
-        "Tell me about Lifelong Learning department",
-        "Extension and adult education programs",
-        "Community education Vidyapith"
-      ],
-      "responses": [
-        "The Lifelong Learning and Extension department runs adult education, extension programs and certificate courses aligned with community outreach and Gandhian pedagogy. See the academics pages for active programs. https://gujaratvidyapith.org/academics/"
-      ]
-    },
-
-    {
-      "tag": "department_Archive_and_Museum",
-      "patterns": [
-        "Does Vidyapith have archives",
-        "Museum and archival collections",
-        "History archive Vidyapith"
-      ],
-      "responses": [
-        "The university maintains archives and historical collections (linked to its Gandhian heritage). Archival courses and museum/heritage research are coordinated through the History & Culture department. For use and access, contact the department. https://gujaratvidyapith.org/departments/"
-      ]
-    },
-
-    {
-      "tag": "department_Research_projects",
-      "patterns": [
-        "Are there research projects",
-        "Funded projects at Vidyapith",
-        "UGC projects and DSA"
-      ],
-      "responses": [
-        "Departments historically participate in UGC-funded programs; e.g., History department previously had DSA support. Current funded projects and calls are published on department news pages. https://gujaratvidyapith.org/news/"
-      ]
-    },
-
-    {
-      "tag": "not_found",
-      "patterns": [],
-      "responses": [
-        "I couldn't find a precise answer for that. Could you rephrase or ask about a specific department, course or admission detail? If you want exact seat counts or fee schedules, I can fetch them from the prospectus."
-      ]
-    }
-  ],
-
-  "sources": [
-    {
-      "description": "Gujarat Vidyapith — official site (About / News / Contact / Academics / Departments / Syllabus).",
-      "cite": "https://gujaratvidyapith.org"
-    },
-    {
-      "description": "Admission prospectus / guidelines 2025 (PDF).",
-      "cite": "https://gujaratvidyapith.org/admission/"
-    },
-    {
-      "description": "Ph.D. admission prospectus 2025 (PDF).",
-      "cite": "https://gujaratvidyapith.org/admission/"
-    },
-    {
-      "description": "Representative department pages (Education, Microbiology, Management, History, Journalism).",
-      "cite": "https://gujaratvidyapith.org/departments/"
-    },
-    {
-      "description": "VIKAS vocational & extension pages.",
-      "cite": "https://gujaratvidyapith.org/vikas/"
-    }
-  ]
 }

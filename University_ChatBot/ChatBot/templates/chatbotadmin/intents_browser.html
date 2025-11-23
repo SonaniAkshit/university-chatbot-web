@@ -1,0 +1,291 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GVP ChatBot - Datasets Browser</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>tailwind.config = { darkMode: 'class' }</script>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+  <style>
+    ::-webkit-scrollbar{width:8px;}
+    ::-webkit-scrollbar-track{background:transparent;}
+    ::-webkit-scrollbar-thumb{background-color:#d1d5db;border-radius:4px;}
+    .dark ::-webkit-scrollbar-thumb{background-color:#4b5563;}
+    .card-hover{transition: transform .3s ease, box-shadow .3s ease;}
+    .card-hover:hover{transform: translateY(-2px); box-shadow:0 10px 20px rgba(0,0,0,0.1);}
+    .dark .card-hover:hover{box-shadow:0 10px 20px rgba(0,0,0,0.3);}
+  </style>
+</head>
+
+<body class="h-screen flex flex-col bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+
+  <!-- Header -->
+  <header class="bg-white dark:bg-gray-800 border-b px-4 py-3 flex items-center justify-between shadow-sm">
+    <h1 class="text-lg font-semibold flex items-center gap-2">
+      <span class="material-symbols-outlined text-[#703737]">admin_panel_settings</span>
+      GVP Admin Dashboard
+    </h1>
+
+    <button id="themeToggle" class="px-3 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+      <span class="material-symbols-outlined">routine</span>
+    </button>
+  </header>
+
+  <div class="flex flex-1 overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside class="hidden md:flex flex-col w-64 border-r bg-white dark:bg-gray-900 p-6">
+      <div class="flex flex-col items-center mb-6">
+        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Ccircle cx='40' cy='40' r='38' fill='%23703737'/%3E%3Ctext x='40' y='50' font-size='30' fill='white' text-anchor='middle'%3EGV%3C/text%3E%3C/svg%3E"
+             class="w-20 h-20 mb-2 rounded-full">
+
+        <h2 class="text-lg font-semibold text-center">Gujarat Vidyapith</h2>
+        <p class="text-sm text-gray-500 dark:text-gray-400">Admin Control Panel</p>
+      </div>
+
+      <hr class="w-full my-4 border-gray-300 dark:border-gray-700">
+
+      <nav class="space-y-2">
+        <a href="{% url 'admin_panel' %}" class="w-full flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700">
+          <span class="material-symbols-outlined">dashboard</span> Dashboard
+        </a>
+        <a href="{% url 'admin_users' %}" class="w-full flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700">
+          <span class="material-symbols-outlined">people</span> Users
+        </a>
+        <a href="{% url 'admin_chat_history' %}" class="w-full flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700">
+          <span class="material-symbols-outlined">chat</span> Chat History
+        </a>
+        <a href="{% url 'admin_pending_questions' %}" class="w-full flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700">
+          <span class="material-symbols-outlined">help</span> Pending Questions
+        </a>
+        <a href="{% url 'admin_intent_manager' %}" class="w-full flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700">
+          <span class="material-symbols-outlined">fact_check</span> Dataset Manager
+        </a>
+        <a href="{% url 'admin_intents_browser' %}" class="w-full flex items-center gap-2 px-3 py-2 rounded-xl bg-[#703737] text-white">
+          <span class="material-symbols-outlined">view_list</span> Datasets Browser
+        </a>
+      </nav>
+
+      <div class="mt-auto pt-6">
+        <a href="{% url 'admin_logout' %}" class="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20">
+          <span class="material-symbols-outlined">logout</span> Logout
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="flex-1 overflow-y-auto p-6">
+      <h1 class="text-2xl font-bold mb-4 flex items-center gap-2">
+        <span class="material-symbols-outlined text-[#703737]">view_list</span>
+        All Intents (JSON)
+      </h1>
+
+      <!-- Search bar -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-sm mb-6">
+        <div class="relative">
+          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">search</span>
+          <input type="text" id="tagSearch" placeholder="Search tag"
+                 class="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700"
+                 onkeyup="filterTags()">
+        </div>
+      </div>
+
+      <!-- Tag cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="tagCards">
+        {% for intent in intents %}
+        <div class="card-hover cursor-pointer p-4 rounded-2xl shadow-sm border bg-white dark:bg-gray-800"
+             onclick="openIntentModal('{{ intent.tag }}')"
+             data-tag="{{ intent.tag|lower }}">
+          <div class="flex items-center justify-between mb-3">
+            <div class="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-xl">
+              <span class="material-symbols-outlined text-3xl text-blue-600 dark:text-blue-400">label</span>
+            </div>
+          </div>
+          <h3 class="font-semibold text-lg break-words">{{ intent.tag }}</h3>
+          <p class="text-xs mt-2 text-gray-500 dark:text-gray-400">
+            {{ intent.patterns|length }} pattern(s) · {{ intent.responses|length }} response(s)
+          </p>
+        </div>
+        {% endfor %}
+      </div>
+    </main>
+  </div>
+
+   <!-- Modal -->
+  <div id="intentModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+    <div class="bg-white dark:bg-gray-800 rounded-xl w-full max-w-2xl p-4 relative max-h-[80vh] flex flex-col">
+      <button onclick="closeIntentModal()" class="absolute top-2 right-2 text-gray-800 dark:text-gray-300">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+
+      <h2 id="modalTitle" class="text-xl font-bold mb-4 pr-8"></h2>
+
+      <!-- scrollable JSON area -->
+      <pre id="modalJson"
+           class="flex-1 text-xs sm:text-sm bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 p-3 rounded-lg overflow-x-auto overflow-y-auto whitespace-pre">
+      </pre>
+
+      <div class="mt-4 flex justify-end gap-2 shrink-0">
+        <button onclick="deleteIntent()"
+                class="px-4 py-2 rounded-lg bg-red-600 text-white text-sm hover:bg-red-700">
+          Delete
+        </button>
+
+        <button onclick="goToUpdateIntent()"
+                class="px-4 py-2 rounded-lg bg-[#703737] text-white text-sm hover:bg-[#5b2b2b]">
+          Update this Intent
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* THEME */
+    function setTheme(theme){
+      if(theme === "dark"){
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+      localStorage.setItem("theme", theme);
+    }
+
+    (function(){
+      const saved = localStorage.getItem("theme");
+      setTheme(saved ? saved : "light");
+    })();
+
+    document.getElementById("themeToggle").onclick = () => {
+      const now = document.documentElement.classList.contains("dark") ? "light" : "dark";
+      setTheme(now);
+    };
+
+    /* CSRF helper */
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== "") {
+        const cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === (name + "=")) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+    const csrftoken = getCookie("csrftoken");
+
+    /* INTENTS DATA */
+    const intentsData = {{ intents_json|safe }};
+    const intentManagerUrl = "{% url 'admin_intent_manager' %}";
+    const deleteIntentUrl   = "{% url 'admin_delete_intent' %}";
+    let currentTag = null;
+
+    function formatIntent(intent){
+      const patLines = intent.patterns.map(p => `        "${p.replace(/"/g, '\\"')}"`);
+      const respLines = intent.responses.map(r => `        "${r.replace(/"/g, '\\"')}"`);
+
+      return `{
+    "tag": "${intent.tag}",
+    "patterns": [
+${patLines.join(",\n")}
+    ],
+    "responses": [
+${respLines.join(",\n")}
+    ]
+}`;
+    }
+
+    function openIntentModal(tag){
+      const intent = intentsData.find(i => i.tag === tag);
+      if (!intent) return;
+
+      currentTag = intent.tag;
+
+      document.getElementById("modalTitle").innerText = `Tag: ${intent.tag}`;
+      document.getElementById("modalJson").textContent = formatIntent(intent);
+
+      const modal = document.getElementById("intentModal");
+      modal.classList.remove("hidden");
+      modal.classList.add("flex");
+    }
+
+    function goToUpdateIntent(){
+      if (!currentTag) return;
+      window.location.href = intentManagerUrl + "?tag=" + encodeURIComponent(currentTag);
+    }
+
+    function deleteIntent(){
+  if (!currentTag) return;
+
+  Swal.fire({
+    title: 'Are you sure?',
+    text: `This will delete intent "${currentTag}" from intents.json!`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Yes, delete it!'
+  }).then((result) => {
+    if (!result.isConfirmed) return;
+
+    fetch(deleteIntentUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrftoken,
+      },
+      body: JSON.stringify({ tag: currentTag })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        Swal.fire({
+          title: 'Deleted!',
+          text: 'Intent has been removed.',
+          icon: 'success',
+          confirmButtonColor: '#3085d6'
+        }).then(() => {
+          window.location.reload();
+        });
+      } else {
+        Swal.fire(
+          'Error',
+          data.error || 'Failed to delete intent.',
+          'error'
+        );
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      Swal.fire(
+        'Request Failed',
+        'Something went wrong while deleting intent.',
+        'error'
+      );
+    });
+  });
+}
+
+    function closeIntentModal(){
+      const modal = document.getElementById("intentModal");
+      modal.classList.add("hidden");
+      modal.classList.remove("flex");
+      currentTag = null;
+    }
+
+    function filterTags(){
+      const q = document.getElementById("tagSearch").value.toLowerCase();
+      document.querySelectorAll("#tagCards > div").forEach(card => {
+        const tag = card.dataset.tag;
+        card.style.display = tag.includes(q) ? "" : "none";
+      });
+    }
+  </script>
+</body>
+</html>

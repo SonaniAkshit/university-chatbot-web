@@ -1,0 +1,296 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dataset Manager - GVP Admin</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config = { darkMode: 'class' }</script>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+  <style>
+    ::-webkit-scrollbar{width:8px;}
+    ::-webkit-scrollbar-track{background:transparent;}
+    ::-webkit-scrollbar-thumb{background-color:#d1d5db;border-radius:4px;}
+    .dark ::-webkit-scrollbar-thumb{background-color:#4b5563;}
+    .card-hover{transition:.3s;}
+    .card-hover:hover{transform:translateY(-2px); box-shadow:0 10px 20px rgba(0,0,0,0.1);}
+    .dark .card-hover:hover{box-shadow:0 10px 20px rgba(0,0,0,0.4);}
+  </style>
+</head>
+
+<body class="h-screen flex flex-col bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+
+<!-- TOAST / ALERT CONTAINER -->
+<div id="alertContainer" class="fixed top-4 right-4 space-y-2 z-50"></div>
+
+<!-- HEADER -->
+<header class="bg-white dark:bg-gray-800 border-b px-4 py-3 flex items-center justify-between shadow-sm">
+  <h1 class="text-lg font-semibold flex items-center gap-2">
+    <span class="material-symbols-outlined text-[#703737]">admin_panel_settings</span>
+    GVP Admin Dashboard
+  </h1>
+  <button id="themeToggle" class="px-3 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+    <span class="material-symbols-outlined">routine</span>
+  </button>
+</header>
+
+<div class="flex flex-1 overflow-hidden">
+
+  <!-- SIDEBAR -->
+  <aside class="hidden md:flex flex-col w-64 border-r bg-white dark:bg-gray-900 p-6">
+    <div class="flex flex-col items-center mb-6">
+      <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Ccircle cx='40' cy='40' r='38' fill='%23703737'/%3E%3Ctext x='40' y='50' font-size='30' fill='white' text-anchor='middle'%3EGV%3C/text%3E%3C/svg%3E"
+           class="w-20 h-20 mb-2 rounded-full">
+
+      <h2 class="text-lg font-semibold">Gujarat Vidyapith</h2>
+      <p class="text-sm text-gray-500 dark:text-gray-400">Admin Control Panel</p>
+    </div>
+
+    <hr class="my-4 border-gray-300 dark:border-gray-700">
+
+    <nav class="space-y-2">
+      <a href="{% url 'admin_panel' %}" class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700">
+        <span class="material-symbols-outlined">dashboard</span> Dashboard
+      </a>
+
+      <a href="{% url 'admin_users' %}" class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700">
+        <span class="material-symbols-outlined">people</span> Users
+      </a>
+
+      <a href="{% url 'admin_chat_history' %}" class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700">
+        <span class="material-symbols-outlined">chat</span> Chat History
+      </a>
+
+      <a href="{% url 'admin_pending_questions' %}" class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700">
+        <span class="material-symbols-outlined">help</span> Pending Questions
+      </a>
+
+      <a href="#" class="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#703737] text-white">
+        <span class="material-symbols-outlined">fact_check</span> Dataset Manager
+      </a>
+      <a href="{% url 'admin_intents_browser' %}" class="w-full flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700">
+        <span class="material-symbols-outlined">view_list</span> Datasets Browser
+      </a>
+    </nav>
+
+    <div class="mt-auto pt-6">
+      <a href="{% url 'admin_logout' %}" class="flex items-center gap-2 px-3 py-2 rounded-xl text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20">
+        <span class="material-symbols-outlined">logout</span> Logout
+      </a>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="flex-1 overflow-y-auto p-6">
+
+    <h1 class="text-2xl font-bold mb-4 flex items-center gap-2">
+      <span class="material-symbols-outlined text-[#703737]">fact_check</span>
+      Dataset Manager
+    </h1>
+
+    <!-- DJANGO MESSAGES (for retrain, etc.) -->
+    {% if messages %}
+      <div class="mb-4 space-y-2">
+        {% for message in messages %}
+          <div class="px-4 py-2 rounded-lg text-sm border
+            {% if message.tags == 'success' %}
+              bg-green-100 text-green-800 border-green-300
+            {% elif message.tags == 'error' %}
+              bg-red-100 text-red-800 border-red-300
+            {% else %}
+              bg-gray-100 text-gray-800 border-gray-300
+            {% endif %}
+          ">
+            {{ message }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <!-- SELECTED PENDING QUESTION -->
+    {% if question %}
+      <div class="p-4 mb-6 rounded-xl bg-yellow-100 dark:bg-yellow-900/40 border border-yellow-400">
+          <h3 class="font-semibold mb-2">Pending Question:</h3>
+          <p class="text-gray-800 dark:text-gray-200">
+            {{ question.question_text }}
+          </p>
+      </div>
+    {% endif %}
+
+    <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
+    <!-- FORM -->
+    <div class="bg-white dark:bg-gray-800 p-6 rounded-xl border dark:border-gray-700 shadow-lg">
+
+      <label class="block font-semibold mb-1">Intent Tag</label>
+      <input id="tagInput" type="text" class="w-full mb-4 p-2 rounded-lg border dark:border-gray-600 bg-gray-50 dark:bg-gray-700">
+
+      <label class="block font-semibold mb-1">Patterns (one per line)</label>
+      <textarea id="patternsInput" rows="4" class="w-full mb-4 p-2 rounded-lg border dark:border-gray-600 bg-gray-50 dark:bg-gray-700"></textarea>
+
+      <label class="block font-semibold mb-1">Responses (one per line)</label>
+      <textarea id="responsesInput" rows="4" class="w-full mb-4 p-2 rounded-lg border dark:border-gray-600 bg-gray-50 dark:bg-gray-700"></textarea>
+
+      <button onclick="saveIntent()" class="px-4 py-2 rounded-lg bg-[#703737] text-white hover:bg-[#5a2e2e]">
+        Save Intent
+      </button>
+
+      <a href="{% url 'admin_retrain_model' %}">
+        <button type="button" class="px-4 py-2 ml-4 rounded-lg bg-blue-600 text-white hover:bg-blue-700">
+          Retrain Model
+        </button>
+      </a>
+
+    </div>
+
+  </main>
+</div>
+
+
+<script>
+  // THEME
+  function setTheme(theme){
+    document.documentElement.classList.toggle("dark", theme === "dark");
+    localStorage.setItem("theme", theme);
+  }
+
+  (function(){
+    setTheme(localStorage.getItem("theme") || "light");
+  })();
+
+  document.getElementById("themeToggle").onclick = () => {
+    const now = document.documentElement.classList.contains("dark") ? "light" : "dark";
+    setTheme(now);
+  };
+
+  // CSRF (from cookie, for fetch)
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+      const cookies = document.cookie.split(";");
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + "=")) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+  const csrftoken = getCookie("csrftoken");
+
+  // ===== TAILWIND ALERT / TOAST =====
+  function showAlert(type, text){
+    const container = document.getElementById("alertContainer");
+    if (!container) return;
+
+    const wrapper = document.createElement("div");
+
+    let baseClasses =
+      "px-4 py-2 rounded-lg text-sm shadow-md border flex items-center gap-2 bg-white";
+    let typeClasses = "";
+
+    if (type === "success") {
+      typeClasses = "bg-green-100 border-green-300 text-green-800";
+    } else if (type === "error") {
+      typeClasses = "bg-red-100 border-red-300 text-red-800";
+    } else {
+      typeClasses = "bg-gray-100 border-gray-300 text-gray-800";
+    }
+
+    wrapper.className = baseClasses + " " + typeClasses;
+
+    const iconSpan = document.createElement("span");
+    iconSpan.className = "material-symbols-outlined text-base";
+    iconSpan.textContent = type === "success" ? "check_circle" :
+                           type === "error" ? "error" : "info";
+
+    const msgSpan = document.createElement("span");
+    msgSpan.textContent = text;
+
+    wrapper.appendChild(iconSpan);
+    wrapper.appendChild(msgSpan);
+
+    container.appendChild(wrapper);
+
+    setTimeout(() => {
+      wrapper.classList.add("opacity-0", "transition", "duration-300");
+      setTimeout(() => wrapper.remove(), 300);
+    }, 3000);
+  }
+
+  // ===== GLOBAL DATA FROM DJANGO =====
+  const intentsData = {{ intents_json|safe }};      // list of intents
+  const selectedTag = {{ selected_tag|safe }};      // "tag-name" or null
+
+  // ===== FILL FORM WHEN COMING FROM INTENTS BROWSER =====
+  function fillFormFromTag(tag){
+    if (!tag) return;
+    const intent = intentsData.find(i => i.tag === tag);
+    if (!intent) return;
+
+    const tagInput = document.getElementById("tagInput");
+    const patternsInput = document.getElementById("patternsInput");
+    const responsesInput = document.getElementById("responsesInput");
+
+    if (tagInput) tagInput.value = intent.tag;
+    if (patternsInput) patternsInput.value = intent.patterns.join("\n");
+    if (responsesInput) responsesInput.value = intent.responses.join("\n");
+  }
+
+  window.addEventListener("load", () => {
+    if (selectedTag) {
+      fillFormFromTag(selectedTag);
+    }
+  });
+
+  // ===== SAVE INTENT (create / update) =====
+  function saveIntent(){
+    const tag = document.getElementById("tagInput").value.trim();
+    const patterns = document.getElementById("patternsInput")
+                      .value.split("\n").map(x => x.trim()).filter(x => x);
+    const responses = document.getElementById("responsesInput")
+                      .value.split("\n").map(x => x.trim()).filter(x => x);
+
+    if (!tag || patterns.length === 0 || responses.length === 0){
+      showAlert("error", "Tag, at least one pattern, and at least one response are required.");
+      return;
+    }
+
+    fetch("{% url 'admin_save_intent' %}", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrftoken,
+      },
+      body: JSON.stringify({
+        tag,
+        patterns,
+        responses,
+        question_id: "{{ question.id|default:'' }}"
+      })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success){
+        showAlert("success", "Intent saved successfully!");
+        setTimeout(() => {
+          window.location.href = "{% url 'admin_intent_manager' %}";
+        }, 800);
+      } else {
+        showAlert("error", data.error || "Error while saving intent.");
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      showAlert("error", "Request failed while saving intent.");
+    });
+  }
+</script>
+
+</body>
+</html>

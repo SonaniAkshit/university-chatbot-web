@@ -1,0 +1,211 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GVP ChatBot - Admin Panel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config = { darkMode: 'class' }</script>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+  <style>
+    ::-webkit-scrollbar{width:8px;}
+    ::-webkit-scrollbar-track{background:transparent;}
+    ::-webkit-scrollbar-thumb{background-color:#d1d5db;border-radius:4px;}
+    .dark ::-webkit-scrollbar-thumb{background-color:#4b5563;}
+
+    .card-hover{transition: transform .3s ease, box-shadow .3s ease;}
+    .card-hover:hover{transform: translateY(-2px); box-shadow:0 10px 20px rgba(0,0,0,0.1);}
+    .dark .card-hover:hover{box-shadow:0 10px 20px rgba(0,0,0,0.3);}
+  </style>
+</head>
+
+<body class="h-screen flex flex-col bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+
+  <!-- Header -->
+  <header class="bg-white dark:bg-gray-800 border-b px-4 py-3 flex items-center justify-between shadow-sm">
+    <h1 class="text-lg font-semibold flex items-center gap-2">
+      <span class="material-symbols-outlined text-[#703737]">admin_panel_settings</span>
+      GVP Admin Dashboard
+    </h1>
+
+    <button id="themeToggle" class="px-3 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+      <span class="material-symbols-outlined">routine</span>
+    </button>
+  </header>
+
+  <div class="flex flex-1 overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside class="hidden md:flex flex-col w-64 border-r bg-white dark:bg-gray-900 p-6">
+      <div class="flex flex-col items-center mb-6">
+        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Ccircle cx='40' cy='40' r='38' fill='%23703737'/%3E%3Ctext x='40' y='50' font-size='30' fill='white' text-anchor='middle'%3EGV%3C/text%3E%3C/svg%3E"
+             class="w-20 h-20 mb-2 rounded-full">
+
+        <h2 class="text-lg font-semibold text-center">Gujarat Vidyapith</h2>
+        <p class="text-sm text-gray-500 dark:text-gray-400">Admin Control Panel</p>
+      </div>
+
+      <hr class="w-full my-4 border-gray-300 dark:border-gray-700">
+
+      <nav class="space-y-2">
+        <a href="{% url 'admin_panel' %}" class="w-full flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700">
+          <span class="material-symbols-outlined">dashboard</span> Dashboard
+        </a>
+        <a href="{% url 'admin_users' %}" class="w-full flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700">
+          <span class="material-symbols-outlined">people</span> Users
+        </a>
+        <a href="{% url 'admin_chat_history' %}" class="w-full flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700">
+          <span class="material-symbols-outlined">chat</span> Chat History
+        </a>
+        <a href="#" class="w-full flex items-center gap-2 px-3 py-2 rounded-xl bg-[#703737] text-white">
+          <span class="material-symbols-outlined">help</span> Pending Questions
+        </a>
+
+        <a href="{% url 'admin_intent_manager' %}" class="w-full flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700">
+          <span class="material-symbols-outlined">fact_check</span> Dataset Manager
+        </a>
+
+        <a href="{% url 'admin_intents_browser' %}" class="w-full flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700">
+          <span class="material-symbols-outlined">view_list</span> Datasets Browser
+        </a>
+
+      </nav>
+
+      <div class="mt-auto pt-6">
+        <a href="{% url 'admin_logout' %}" class="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20">
+          <span class="material-symbols-outlined">logout</span> Logout
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <main class="flex-1 overflow-y-auto p-6">
+
+      <h1 class="text-2xl font-bold mb-4 flex items-center gap-2">
+        <span class="material-symbols-outlined text-[#703737]">help</span>
+        Pending Questions
+      </h1>
+
+      <!-- SEARCH BAR -->
+      <div class="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 shadow-sm mb-6">
+        <div class="relative">
+          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">search</span>
+          <input type="text" id="userSearch" placeholder="Search"
+                 class="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700"
+                 onkeyup="filterUsers()">
+        </div>
+      </div>
+
+      <!-- CARDS (pending users) -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="userCards">
+        {% for u in pending_data %}
+        <div onclick="openPendingModal('{{ u.username }}')"
+             class="card-hover cursor-pointer p-4 rounded-2xl shadow-sm border bg-white dark:bg-gray-800"
+             data-username="{{ u.username|lower }}">
+
+          <div class="flex items-center justify-between mb-3">
+            <div class="p-3 bg-purple-100 dark:bg-purple-900/30 rounded-xl">
+              <span class="material-symbols-outlined text-3xl text-purple-600 dark:text-purple-400">person</span>
+            </div>
+            <span class="text-xs px-2 py-1 bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 rounded-full">
+              {{ u.count }} Pending
+            </span>
+          </div>
+
+          <h3 class="font-semibold text-lg">{{ u.username }}</h3>
+          <p class="text-sm text-gray-600 dark:text-gray-400">{{ u.email }}</p>
+        </div>
+        {% endfor %}
+      </div>
+
+    </main>
+  </div>
+
+  <!-- Modal -->
+  <div id="pendingModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+    <div class="bg-white dark:bg-gray-800 rounded-xl w-full max-w-2xl p-4 relative">
+      <button onclick="closePendingModal()" class="absolute top-2 right-2 text-gray-800 dark:text-gray-300">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+
+      <h2 id="modalName" class="text-xl font-bold mb-4"></h2>
+      <div id="modalMessages" class="h-96 overflow-y-auto space-y-3 p-2 bg-gray-50 dark:bg-gray-900 rounded-lg"></div>
+    </div>
+  </div>
+
+<script>
+  /* THEME FIX */
+
+  
+  function setTheme(theme){
+    if(theme === "dark"){
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+    localStorage.setItem("theme", theme);
+  }
+
+  (function(){
+    const saved = localStorage.getItem("theme");
+    setTheme(saved ? saved : "light");
+  })();
+
+  document.getElementById("themeToggle").onclick = () => {
+    const now = document.documentElement.classList.contains("dark") ? "light" : "dark";
+    setTheme(now);
+  };
+
+  /* PENDING DATA */
+  const pendingData = {{ pending_data|safe }};
+  const intentManagerUrl = "{% url 'admin_intent_manager' %}";  // <-- add this
+
+  function openPendingModal(username){
+    const user = pendingData.find(u => u.username === username);
+    if (!user) return;
+
+    document.getElementById("modalName").innerText =
+      username + " - Pending Questions";
+
+    let box = document.getElementById("modalMessages");
+    box.innerHTML = "";
+
+    user.questions.forEach(q => {
+      box.innerHTML += `
+      <div class="max-w-xs p-3 rounded-lg bg-gray-200 dark:bg-gray-700">
+        <p class="text-sm mb-1">${q.text}</p>
+        <span class="text-xs text-gray-500 block mb-2">${q.created_at}</span>
+
+        <a href="${intentManagerUrl}?pending_id=${q.id}"
+           class="inline-flex items-center px-3 py-1 text-xs font-medium rounded-lg bg-[#703737] text-white hover:bg-[#5a2c2c]">
+          Resolve in Intent Manager
+        </a>
+      </div>
+      `;
+    });
+
+    document.getElementById("pendingModal").classList.remove("hidden");
+    document.getElementById("pendingModal").classList.add("flex");
+  }
+
+  function closePendingModal(){
+    document.getElementById("pendingModal").classList.add("hidden");
+  }
+
+  function closePendingModal(){
+    document.getElementById("pendingModal").classList.add("hidden");
+  }
+
+  /* SEARCH */
+  function filterUsers(){
+    const q = document.getElementById("userSearch").value.toLowerCase();
+    document.querySelectorAll("#userCards > div").forEach(card=>{
+      let username = card.dataset.username;
+      card.style.display = username.includes(q) ? "" : "none";
+    });
+  }
+</script>
+
+</body>
+</html>

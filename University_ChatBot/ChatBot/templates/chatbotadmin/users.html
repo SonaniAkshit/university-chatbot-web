@@ -85,6 +85,15 @@
             <a href="{% url 'admin_chat_history'  %}" class="w-full flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700">
                 <span class="material-symbols-outlined text-base">chat</span>Chat History
             </a>
+             <a href="{% url 'admin_pending_questions' %}" class="w-full flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700">
+                <span class="material-symbols-outlined">help</span> Pending Questions
+            </a>
+            <a href="{% url 'admin_intent_manager' %}" class="w-full flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700">
+                <span class="material-symbols-outlined">fact_check</span> Dataset Manager
+            </a>
+            <a href="{% url 'admin_intents_browser' %}" class="w-full flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700">
+                <span class="material-symbols-outlined">view_list</span> Datasets Browser
+            </a>
             <!-- <a href="#" class="w-full flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700">
                 <span class="material-symbols-outlined text-base">analytics</span>Analytics
             </a>
