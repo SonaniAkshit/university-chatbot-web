@@ -231,6 +231,20 @@
                 "I don’t have an exact answer for that. Try asking about a specific program, department, fees, admission process or contact detail.",
                 "Sorry, I couldn’t find a clear answer. Please rephrase your question or ask about Gujarat Vidyapith courses, admissions, fees, hostels or campus."
             ]
+        },
+        {
+            "tag": "Add New",
+            "patterns": [
+                "add pattern 1",
+                "add pattern 2",
+                "add pattern 3",
+                "add pattern 4"
+            ],
+            "responses": [
+                "add Responses 1",
+                "add Responses 2",
+                "add Responses 3"
+            ]
         }
     ]
 }
